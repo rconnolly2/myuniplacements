@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "958057239508",
+    "project_id": "myuniplacement",
+    "storage_bucket": "myuniplacement.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:958057239508:android:5b3c1d56210c62a1de7c41",
+        "android_client_info": {
+          "package_name": "com.example.myuniplacementapp"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyA1CA0fQCOWJwhbvaGii0jyRtk4uzOFpgY"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
