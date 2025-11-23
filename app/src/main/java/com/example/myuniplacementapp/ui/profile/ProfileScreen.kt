@@ -18,7 +18,7 @@ import java.time.format.DateTimeFormatter
 @Composable
 fun ProfileScreen(viewModel: UserViewModel) {
     val userEmail = FirebaseAuth.getInstance().currentUser?.email
-    val users by viewModel.getUser()
+    val users by viewModel.users.collectAsState()
     val scope = rememberCoroutineScope()
     val snackbarHostState = remember { SnackbarHostState() }
 
