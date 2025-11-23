@@ -15,7 +15,7 @@ class UserViewModel(private val repository: UserRepository) : ViewModel() {
     val users: StateFlow<List<UserEntity>> =
         repository.getAllUsers().stateIn(viewModelScope, SharingStarted.Lazily, emptyList())
 
-    fun addUser(first: String, last: String, email: String, phone: String, dob: String) {
+    fun addUser(first: String, last: String, email: String, phone: String = "", dob: String = "") {
         if (email.isNotBlank()) {
             viewModelScope.launch {
                 val parsedDob = dob.takeIf { it.isNotBlank() }?.let { LocalDate.parse(it) }

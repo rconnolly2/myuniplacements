@@ -32,7 +32,7 @@ class UserRepository(
 
     suspend fun saveUser(user: UserEntity) {
         dao.insertUser(user)
-        if (isOnline()) remote.saveUserProfile(user)
+        remote.saveUserProfile(user)
     }
 
     suspend fun deleteUser(user: UserEntity) {

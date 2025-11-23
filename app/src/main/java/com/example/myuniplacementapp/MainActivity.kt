@@ -2,9 +2,11 @@ package com.example.myuniplacementapp
 
 import android.content.Context
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.datastore.preferences.preferencesDataStore
@@ -15,6 +17,7 @@ import com.example.myuniplacementapp.data.prefs.UserPreferencesRepository
 import com.example.myuniplacementapp.data.remote.UserRemoteDataSource
 import com.example.myuniplacementapp.repository.UserRepository
 import com.example.myuniplacementapp.ui.UserApp
+import com.example.myuniplacementapp.ui.auth.AuthHost
 import com.example.myuniplacementapp.ui.login.LoginScreen
 import com.example.myuniplacementapp.ui.theme.UserAppTheme
 import com.example.myuniplacementapp.viewmodel.LoginState
@@ -56,6 +59,9 @@ class MainActivity : ComponentActivity() {
             val loginState by loginViewModel.loginState.collectAsState()
 
             UserAppTheme(darkTheme = isDark) {
+                LaunchedEffect(Unit) {
+                    Log.d("VM", "MainActivity UserViewModel: ${userViewModel.hashCode()}")
+                }
                 if (loginState is LoginState.Success) {
                     UserApp(
                         userViewModel = userViewModel,
@@ -63,10 +69,9 @@ class MainActivity : ComponentActivity() {
                         loginViewModel = loginViewModel
                     )
                 } else {
-                    LoginScreen(
+                    AuthHost(
                         loginViewModel = loginViewModel,
                         userViewModel = userViewModel,
-                        onLoginSuccess = { recreate() }
                     )
                 }
             }

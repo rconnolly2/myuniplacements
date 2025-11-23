@@ -1,5 +1,6 @@
-package com.example.myuniplacementapp.ui.login
+package com.example.myuniplacementapp.ui.register
 
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -10,11 +11,11 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -23,21 +24,30 @@ import com.example.myuniplacementapp.viewmodel.*
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun LoginScreen(
+fun RegisterScreen(
     loginViewModel: LoginViewModel = viewModel(),
     userViewModel: UserViewModel,
-    onClickGoToRegister: () -> Unit
+    onGoToLogin: () -> Unit
 ) {
     val state by loginViewModel.loginState.collectAsState()
+
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
+    var firstName by remember { mutableStateOf("") }
+    var lastName by remember { mutableStateOf("") }
+
+    LaunchedEffect(state) {
+        if (state is LoginState.Success) {
+            onGoToLogin()
+        }
+    }
 
     Scaffold(
         topBar = {
             TopAppBar(
                 title = {
                     Box(Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
-                        Text("Login", style = MaterialTheme.typography.headlineMedium)
+                        Text("Register", style = MaterialTheme.typography.headlineMedium)
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
@@ -50,20 +60,20 @@ fun LoginScreen(
     ) { padding ->
 
         Column(
-            modifier = Modifier
+            Modifier
                 .padding(padding)
                 .fillMaxSize()
                 .background(MaterialTheme.colorScheme.background)
         ) {
 
             Row(
-                modifier = Modifier
+                Modifier
                     .fillMaxWidth()
-                    .height(320.dp)
+                    .height(300.dp)
             ) {
 
                 Image(
-                    painter = painterResource(R.drawable.login_students),
+                    painter = painterResource(R.drawable.register_students),
                     contentDescription = null,
                     contentScale = ContentScale.Crop,
                     modifier = Modifier
@@ -72,138 +82,104 @@ fun LoginScreen(
                 )
 
                 Box(
-                    modifier = Modifier
+                    Modifier
                         .weight(1f)
                         .fillMaxHeight()
                         .background(MaterialTheme.colorScheme.secondary.copy(alpha = 0.92f))
                 ) {
                     Column(
-                        modifier = Modifier
+                        Modifier
                             .fillMaxSize()
                             .padding(24.dp),
                         horizontalAlignment = Alignment.CenterHorizontally,
                         verticalArrangement = Arrangement.Center
                     ) {
                         Text(
-                            "Register",
+                            "Login",
                             style = MaterialTheme.typography.headlineLarge.copy(fontWeight = FontWeight.Bold),
                             color = MaterialTheme.colorScheme.onSecondary
                         )
 
-                        Spacer(Modifier.height(14.dp))
+                        Spacer(Modifier.height(12.dp))
 
                         Text(
-                            "If you don’t have an account, you just need a TUS email address.",
-                            style = MaterialTheme.typography.bodyLarge,
+                            "If you already have an account please go to login.",
                             color = MaterialTheme.colorScheme.onSecondary,
-                            modifier = Modifier.fillMaxWidth(),
-                            textAlign = androidx.compose.ui.text.style.TextAlign.Center
+                            textAlign = TextAlign.Center
                         )
 
-                        Spacer(Modifier.height(24.dp))
+                        Spacer(Modifier.height(20.dp))
 
                         Button(
-                            onClick = onClickGoToRegister,
-                            shape = RoundedCornerShape(10.dp),
+                            onClick = onGoToLogin,
                             colors = ButtonDefaults.buttonColors(
-                                containerColor = MaterialTheme.colorScheme.primary,
-                                contentColor = MaterialTheme.colorScheme.onPrimary
+                                containerColor = MaterialTheme.colorScheme.primary
                             )
-                        ) {
-                            Text("Click here")
-                        }
+                        ) { Text("Click here") }
                     }
                 }
             }
 
-            Spacer(Modifier.height(40.dp))
+            Spacer(Modifier.height(30.dp))
 
-            Column(
-                modifier = Modifier
-                    .padding(horizontal = 24.dp)
-                    .fillMaxWidth()
-            ) {
+            Column(Modifier.padding(horizontal = 24.dp)) {
 
-                OutlinedTextField(
+                AuthTextField(
                     value = email,
                     onValueChange = { email = it },
-                    label = { Text("Your TUS email") },
-                    singleLine = true,
-                    modifier = Modifier.fillMaxWidth(),
-                    trailingIcon = {
-                        if (email.isNotEmpty()) {
-                            IconButton(onClick = { email = "" }) {
-                                Icon(Icons.Default.Close, null)
-                            }
-                        }
-                    },
-                    shape = RoundedCornerShape(12.dp),
-                    colors = OutlinedTextFieldDefaults.colors(
-                        focusedBorderColor = MaterialTheme.colorScheme.primary,
-                        unfocusedBorderColor = MaterialTheme.colorScheme.primary,
-                        cursorColor = MaterialTheme.colorScheme.primary,
-                        focusedLabelColor = MaterialTheme.colorScheme.primary,
-                        unfocusedLabelColor = MaterialTheme.colorScheme.primary
-                    )
+                    label = "Your TUS email"
                 )
 
-                Spacer(Modifier.height(20.dp))
+                Spacer(Modifier.height(16.dp))
 
-                OutlinedTextField(
+                AuthTextField(
                     value = password,
                     onValueChange = { password = it },
-                    label = { Text("Your password") },
-                    singleLine = true,
-                    modifier = Modifier.fillMaxWidth(),
-                    visualTransformation = PasswordVisualTransformation(),
-                    trailingIcon = {
-                        if (password.isNotEmpty()) {
-                            IconButton(onClick = { password = "" }) {
-                                Icon(Icons.Default.Close, null)
-                            }
-                        }
-                    },
-                    shape = RoundedCornerShape(12.dp),
-                    colors = OutlinedTextFieldDefaults.colors(
-                        focusedBorderColor = MaterialTheme.colorScheme.primary,
-                        unfocusedBorderColor = MaterialTheme.colorScheme.primary,
-                        cursorColor = MaterialTheme.colorScheme.primary,
-                        focusedLabelColor = MaterialTheme.colorScheme.primary,
-                        unfocusedLabelColor = MaterialTheme.colorScheme.primary
-                    )
+                    label = "Your password",
+                    isPassword = true
                 )
 
-                Spacer(Modifier.height(32.dp))
+                Spacer(Modifier.height(16.dp))
+
+                AuthTextField(
+                    value = firstName,
+                    onValueChange = { firstName = it },
+                    label = "Your first name"
+                )
+
+                Spacer(Modifier.height(16.dp))
+
+                AuthTextField(
+                    value = lastName,
+                    onValueChange = { lastName = it },
+                    label = "Your last name"
+                )
+
+                Spacer(Modifier.height(28.dp))
 
                 Button(
                     onClick = {
-                        if (email.isNotBlank() && password.isNotBlank()) {
-                            loginViewModel.login(email, password)
-                            userViewModel.getUser(email)
+                        if (password.isNotBlank() && email.isNotBlank() && password.isNotBlank() && firstName.isNotBlank() && lastName.isNotBlank()) {
+                            loginViewModel.register(email, password)
+                            userViewModel.addUser(firstName, lastName, email)
                         }
                     },
                     modifier = Modifier
                         .fillMaxWidth()
-                        .height(62.dp)
-                        .clip(RoundedCornerShape(14.dp)),
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = MaterialTheme.colorScheme.primary,
-                        contentColor = MaterialTheme.colorScheme.onPrimary
-                    )
+                        .height(60.dp),
+                    shape = RoundedCornerShape(14.dp)
                 ) {
-                    Text("Login", style = MaterialTheme.typography.titleLarge)
+                    Text("Register", style = MaterialTheme.typography.titleLarge)
                 }
 
                 when (state) {
                     is LoginState.Loading -> {
                         Spacer(Modifier.height(20.dp))
                         Box(
-                            modifier = Modifier.fillMaxWidth(),
+                            Modifier.fillMaxWidth(),
                             contentAlignment = Alignment.Center
                         ) {
-                            CircularProgressIndicator(
-                                color = MaterialTheme.colorScheme.primary
-                            )
+                            CircularProgressIndicator()
                         }
                     }
 
@@ -223,8 +199,33 @@ fun LoginScreen(
 
                     else -> {}
                 }
-
             }
         }
     }
 }
+
+@Composable
+fun AuthTextField(
+    value: String,
+    onValueChange: (String) -> Unit,
+    label: String,
+    isPassword: Boolean = false
+) {
+    OutlinedTextField(
+        value = value,
+        onValueChange = onValueChange,
+        label = { Text(label) },
+        singleLine = true,
+        visualTransformation = if (isPassword) PasswordVisualTransformation() else VisualTransformation.None,
+        trailingIcon = {
+            if (value.isNotEmpty()) {
+                IconButton(onClick = { onValueChange("") }) {
+                    Icon(Icons.Default.Close, null)
+                }
+            }
+        },
+        modifier = Modifier.fillMaxWidth(),
+        shape = RoundedCornerShape(12.dp)
+    )
+}
+
