@@ -14,4 +14,3 @@ data class UserEntity(
     val phoneNumber: String,
     val dateOfBirth: LocalDate? = null
 )
-

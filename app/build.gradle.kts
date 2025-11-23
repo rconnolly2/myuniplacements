@@ -43,6 +43,8 @@ android {
 }
 
 dependencies {
+    implementation("io.coil-kt:coil-compose:2.6.0")
+
     coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.0.4")
     // ✅ Jetpack Compose BOM (manages all Compose versions)
     implementation(platform("com.google.firebase:firebase-bom:33.5.1"))

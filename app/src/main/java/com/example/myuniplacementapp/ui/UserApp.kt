@@ -17,11 +17,19 @@ import com.example.myuniplacementapp.ui.home.HomeScreen
 import com.example.myuniplacementapp.ui.profile.ProfileScreen
 import com.example.myuniplacementapp.ui.users.UsersScreen
 import com.example.myuniplacementapp.ui.settings.SettingsScreen
+import com.example.myuniplacementapp.viewmodel.AnnouncementViewModel
 import com.example.myuniplacementapp.viewmodel.LoginViewModel
+import com.example.myuniplacementapp.viewmodel.PlacementViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun UserApp(userViewModel: UserViewModel, settingsViewModel: SettingsViewModel, loginViewModel: LoginViewModel) {
+fun UserApp(
+    userViewModel: UserViewModel,
+    settingsViewModel: SettingsViewModel,
+    loginViewModel: LoginViewModel,
+    placementViewModel: PlacementViewModel,
+    announcementViewModel: AnnouncementViewModel
+) {
     val navController = rememberNavController()
     val drawerState = rememberDrawerState(DrawerValue.Closed)
     val scope = rememberCoroutineScope()
@@ -50,10 +58,10 @@ fun UserApp(userViewModel: UserViewModel, settingsViewModel: SettingsViewModel, 
         Scaffold(
             topBar = {
                 CenterAlignedTopAppBar(
-                    title = { Text("User App") },
+                    title = { Text("MyUniPlacements") },
                     navigationIcon = {
                         IconButton(onClick = { scope.launch { drawerState.open() } }) {
-                            Icon(Icons.Default.Menu, contentDescription = "Menu")
+                            Icon(Icons.Default.Menu, contentDescription = null)
                         }
                     }
                 )
@@ -64,17 +72,24 @@ fun UserApp(userViewModel: UserViewModel, settingsViewModel: SettingsViewModel, 
                 startDestination = "home",
                 modifier = Modifier.padding(innerPadding)
             ) {
-                composable("home") { HomeScreen() }
-                composable("profile") { ProfileScreen(
-                    viewModel = userViewModel
-                ) }
-                composable("users") {
-                    UsersScreen(
-                        viewModel = userViewModel,
-                        onNavigateSettings = { navController.navigate("settings") }
+                composable("home") {
+                    HomeScreen(
+                        placementViewModel = placementViewModel,
+                        announcementViewModel = announcementViewModel
                     )
                 }
-                composable("settings") { SettingsScreen(navController, settingsViewModel) }
+                composable("profile") {
+                    ProfileScreen(viewModel = userViewModel)
+                }
+                composable("my_applications") {
+                    // TODO
+                }
+                composable("my_applications") {
+                    // TODO
+                }
+                composable("settings") {
+                    SettingsScreen(navController, settingsViewModel)
+                }
             }
         }
     }

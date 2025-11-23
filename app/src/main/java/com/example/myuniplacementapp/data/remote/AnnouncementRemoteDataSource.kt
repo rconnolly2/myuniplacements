@@ -10,26 +10,25 @@ class AnnouncementRemoteDataSource(
 ) {
     private val announcements = firestore.collection("announcements")
 
-    suspend fun saveAnnouncement(a: AnnouncementEntity) {
-        val model = AnnouncementRemoteModel(
-            id = a.id,
-            title = a.title,
-            content = a.content,
-            addedDate = a.addedDate.toString(),
-            modifiedDate = a.modifiedDate.toString()
-        )
-        announcements.document(a.id).set(model).await()
-    }
-
     suspend fun getAnnouncement(id: String): AnnouncementEntity? {
         val snapshot = announcements.document(id).get().await()
         val model = snapshot.toObject(AnnouncementRemoteModel::class.java) ?: return null
-        val added = if (model.addedDate.isNotBlank()) LocalDate.parse(model.addedDate) else LocalDate.now()
-        val modified = if (model.modifiedDate.isNotBlank()) LocalDate.parse(model.modifiedDate) else LocalDate.now()
+
+        val added = model.addedDate
+            .takeIf { it.isNotBlank() }
+            ?.let { LocalDate.parse(it) }
+            ?: LocalDate.now()
+
+        val modified = model.modifiedDate
+            .takeIf { it.isNotBlank() }
+            ?.let { LocalDate.parse(it) }
+            ?: LocalDate.now()
+
         return AnnouncementEntity(
-            id = model.id,
+            id = snapshot.id,
             title = model.title,
             content = model.content,
+            image = model.image,
             addedDate = added,
             modifiedDate = modified
         )
@@ -37,21 +36,28 @@ class AnnouncementRemoteDataSource(
 
     suspend fun getAllAnnouncements(): List<AnnouncementEntity> {
         val snapshot = announcements.get().await()
+
         return snapshot.documents.mapNotNull { doc ->
             val model = doc.toObject(AnnouncementRemoteModel::class.java) ?: return@mapNotNull null
-            val added = if (model.addedDate.isNotBlank()) LocalDate.parse(model.addedDate) else LocalDate.now()
-            val modified = if (model.modifiedDate.isNotBlank()) LocalDate.parse(model.modifiedDate) else LocalDate.now()
+
+            val added = model.addedDate
+                .takeIf { it.isNotBlank() }
+                ?.let { LocalDate.parse(it) }
+                ?: LocalDate.now()
+
+            val modified = model.modifiedDate
+                .takeIf { it.isNotBlank() }
+                ?.let { LocalDate.parse(it) }
+                ?: LocalDate.now()
+
             AnnouncementEntity(
-                id = model.id,
+                id = doc.id,
                 title = model.title,
                 content = model.content,
+                image = model.image,
                 addedDate = added,
                 modifiedDate = modified
             )
         }
-    }
-
-    suspend fun deleteAnnouncement(a: AnnouncementEntity) {
-        announcements.document(a.id).delete().await()
     }
 }

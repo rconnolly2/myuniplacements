@@ -9,6 +9,7 @@ data class AnnouncementEntity(
     @PrimaryKey val id: String,
     val title: String,
     val content: String,
+    val image: String,
     val addedDate: LocalDate,
     val modifiedDate: LocalDate
 )

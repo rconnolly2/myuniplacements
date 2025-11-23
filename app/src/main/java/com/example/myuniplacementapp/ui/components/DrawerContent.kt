@@ -31,11 +31,17 @@ fun DrawerContent(
                 scope.launch { drawerState.close() }
                 navController.navigate("home")
             })
-        Text("Users", modifier = Modifier
+        Text("My Applications", modifier = Modifier
             .fillMaxWidth()
             .clickable {
                 scope.launch { drawerState.close() }
-                navController.navigate("users")
+                navController.navigate("my_applications")
+            })
+        Text("Placements", modifier = Modifier
+            .fillMaxWidth()
+            .clickable {
+                scope.launch { drawerState.close() }
+                navController.navigate("placements")
             })
         Text("Profile", modifier = Modifier
             .fillMaxWidth()
