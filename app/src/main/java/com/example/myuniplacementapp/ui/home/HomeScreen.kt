@@ -1,11 +1,14 @@
 package com.example.myuniplacementapp.ui.home
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -16,6 +19,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
+import com.example.myuniplacementapp.data.local.AnnouncementEntity
 import com.example.myuniplacementapp.viewmodel.AnnouncementViewModel
 import com.example.myuniplacementapp.viewmodel.PlacementViewModel
 
@@ -26,6 +30,7 @@ fun HomeScreen(
 ) {
     val announcements by announcementViewModel.announcements.collectAsState()
     val placements by placementViewModel.placements.collectAsState()
+    var selectedAnnouncement by remember { mutableStateOf<AnnouncementEntity?>(null) }
 
     Column(
         modifier = Modifier
@@ -51,7 +56,8 @@ fun HomeScreen(
                     contentDescription = null,
                     modifier = Modifier
                         .size(width = 300.dp, height = 170.dp)
-                        .clip(RoundedCornerShape(22.dp)),
+                        .clip(RoundedCornerShape(22.dp))
+                        .clickable { selectedAnnouncement = ann },
                     contentScale = ContentScale.Crop
                 )
             }
@@ -119,5 +125,81 @@ fun HomeScreen(
                 }
             }
         }
+    }
+
+    AnnouncementPopup(
+        announcement = selectedAnnouncement,
+        onDismiss = { selectedAnnouncement = null }
+    )
+}
+
+@Composable
+fun AnnouncementPopup(
+    announcement: AnnouncementEntity?,
+    onDismiss: () -> Unit
+) {
+    if (announcement != null) {
+
+        val formattedDate = announcement.addedDate.format(
+            java.time.format.DateTimeFormatter.ofPattern(
+                "d MMMM yyyy",
+                java.util.Locale.getDefault()
+            )
+        )
+
+        AlertDialog(
+            onDismissRequest = onDismiss,
+            confirmButton = {},
+            text = {
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .wrapContentHeight()
+                ) {
+                    Text(
+                        announcement.title,
+                        style = MaterialTheme.typography.titleLarge
+                    )
+
+                    Spacer(Modifier.height(12.dp))
+
+                    AsyncImage(
+                        model = announcement.image,
+                        contentDescription = null,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(120.dp)
+                            .clip(RoundedCornerShape(12.dp)),
+                        contentScale = ContentScale.Crop
+                    )
+
+                    Spacer(Modifier.height(12.dp))
+
+                    Text(
+                        text = announcement.content,
+                        style = MaterialTheme.typography.bodyMedium,
+                        textAlign = androidx.compose.ui.text.style.TextAlign.Justify
+                    )
+
+                    Spacer(Modifier.height(20.dp))
+
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Text(
+                            text = formattedDate,
+                            style = MaterialTheme.typography.labelMedium.copy(
+                                color = MaterialTheme.colorScheme.primary
+                            )
+                        )
+                        TextButton(onClick = onDismiss) {
+                            Text("Close")
+                        }
+                    }
+                }
+            }
+        )
     }
 }
