@@ -15,7 +15,6 @@ import com.example.myuniplacementapp.viewmodel.UserViewModel
 import com.example.myuniplacementapp.viewmodel.SettingsViewModel
 import com.example.myuniplacementapp.ui.home.HomeScreen
 import com.example.myuniplacementapp.ui.profile.ProfileScreen
-import com.example.myuniplacementapp.ui.users.UsersScreen
 import com.example.myuniplacementapp.ui.settings.SettingsScreen
 import com.example.myuniplacementapp.viewmodel.AnnouncementViewModel
 import com.example.myuniplacementapp.viewmodel.LoginViewModel
@@ -34,6 +33,7 @@ fun UserApp(
     val drawerState = rememberDrawerState(DrawerValue.Closed)
     val scope = rememberCoroutineScope()
     val isDark by settingsViewModel.isDarkTheme.collectAsState()
+    val currentRoute = navController.currentBackStackEntryAsState().value?.destination?.route
 
     ModalNavigationDrawer(
         drawerState = drawerState,
@@ -57,14 +57,16 @@ fun UserApp(
     ) {
         Scaffold(
             topBar = {
-                CenterAlignedTopAppBar(
-                    title = { Text("MyUniPlacements") },
-                    navigationIcon = {
-                        IconButton(onClick = { scope.launch { drawerState.open() } }) {
-                            Icon(Icons.Default.Menu, contentDescription = null)
+                if (currentRoute != "profile") {
+                    CenterAlignedTopAppBar(
+                        title = { Text("MyUniPlacements") },
+                        navigationIcon = {
+                            IconButton(onClick = { scope.launch { drawerState.open() } }) {
+                                Icon(Icons.Default.Menu, null)
+                            }
                         }
-                    }
-                )
+                    )
+                }
             }
         ) { innerPadding ->
             NavHost(
@@ -79,7 +81,10 @@ fun UserApp(
                     )
                 }
                 composable("profile") {
-                    ProfileScreen(viewModel = userViewModel)
+                    ProfileScreen(
+                        viewModel = userViewModel,
+                        onBack = { navController.popBackStack() }
+                    )
                 }
                 composable("my_applications") {
                     // TODO

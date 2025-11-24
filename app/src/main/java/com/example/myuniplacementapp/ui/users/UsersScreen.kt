@@ -94,7 +94,10 @@ fun UsersScreen(viewModel: UserViewModel,
 
             // --- User List with Delete Button ---
             LazyColumn {
-                items(users, key = { it.email }) { user ->
+                items(
+                    items = users,
+                    key = { user: UserEntity -> user.email }
+                ) { user: UserEntity ->
                     UserRow(
                         user = user,
                         onDelete = {

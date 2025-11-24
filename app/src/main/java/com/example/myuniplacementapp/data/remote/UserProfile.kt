@@ -5,5 +5,6 @@ data class UserProfile(
     val lastName: String = "",
     val email: String = "",
     val phoneNumber: String = "",
-    val dateOfBirth: String = ""
+    val dateOfBirth: String = "",
+    val profileImageBlob: String = ""
 )

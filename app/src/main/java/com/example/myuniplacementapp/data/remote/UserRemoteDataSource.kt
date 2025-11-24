@@ -1,5 +1,6 @@
 package com.example.myuniplacementapp.data.remote
 
+import android.util.Base64
 import com.example.myuniplacementapp.data.local.UserEntity
 import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.tasks.await
@@ -11,51 +12,59 @@ class UserRemoteDataSource(
     private val users = firestore.collection("users")
 
     suspend fun saveUserProfile(user: UserEntity) {
-        val userProfile = UserProfile(
+        val blob = user.profileImageBlob?.let {
+            Base64.encodeToString(it, Base64.DEFAULT)
+        } ?: ""
+
+        val profile = UserProfile(
             firstName = user.firstName,
             lastName = user.lastName,
             email = user.email,
             phoneNumber = user.phoneNumber,
-            dateOfBirth = user.dateOfBirth?.toString() ?: ""
+            dateOfBirth = user.dateOfBirth?.toString() ?: "",
+            profileImageBlob = blob
         )
-        users.document(user.email).set(userProfile).await()
+
+        users.document(user.email).set(profile).await()
     }
 
     suspend fun getUserProfile(email: String): UserEntity? {
-        val snapshot = users.document(email).get().await()
-        val profile = snapshot.toObject(UserProfile::class.java) ?: return null
-        // I parse date of birth if it's not blank
-        val dateOfBirth = profile.dateOfBirth.let { dob ->
-            if (dob.isNotBlank()) LocalDate.parse(dob) else null
-        }
+        val snap = users.document(email).get().await()
+        val p = snap.toObject(UserProfile::class.java) ?: return null
+
+        val dob = if (p.dateOfBirth.isNotBlank()) LocalDate.parse(p.dateOfBirth) else null
+        val bytes = if (p.profileImageBlob.isNotBlank())
+            Base64.decode(p.profileImageBlob, Base64.DEFAULT)
+        else null
 
         return UserEntity(
-            firstName = profile.firstName,
-            lastName = profile.lastName,
-            email = profile.email,
-            phoneNumber = profile.phoneNumber,
-            dateOfBirth = dateOfBirth
+            email = p.email,
+            firstName = p.firstName,
+            lastName = p.lastName,
+            phoneNumber = p.phoneNumber,
+            dateOfBirth = dob,
+            profileImageBlob = bytes
         )
     }
 
     suspend fun getAllUsers(): List<UserEntity> {
-        val snapshot = users.get().await()
+        val snap = users.get().await()
 
-        return snapshot.documents.mapNotNull { doc ->
-            // I convert document snapshot to UserProfile
-            val profile = doc.toObject(UserProfile::class.java) ?: return@mapNotNull null
+        return snap.documents.mapNotNull { doc ->
+            val p = doc.toObject(UserProfile::class.java) ?: return@mapNotNull null
 
-            // I parse DOB if it's not blank
-            val dateOfBirth = profile.dateOfBirth.let { dob ->
-                if (dob.isNotBlank()) LocalDate.parse(dob) else null
-            }
+            val dob = if (p.dateOfBirth.isNotBlank()) LocalDate.parse(p.dateOfBirth) else null
+            val bytes =
+                if (p.profileImageBlob.isNotBlank()) Base64.decode(p.profileImageBlob, Base64.DEFAULT)
+                else null
 
             UserEntity(
-                firstName = profile.firstName,
-                lastName = profile.lastName,
-                email = profile.email,
-                phoneNumber = profile.phoneNumber,
-                dateOfBirth = dateOfBirth
+                email = p.email,
+                firstName = p.firstName,
+                lastName = p.lastName,
+                phoneNumber = p.phoneNumber,
+                dateOfBirth = dob,
+                profileImageBlob = bytes
             )
         }
     }
