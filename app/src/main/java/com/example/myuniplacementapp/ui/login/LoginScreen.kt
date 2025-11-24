@@ -105,10 +105,6 @@ fun LoginScreen(
                         Button(
                             onClick = onClickGoToRegister,
                             shape = RoundedCornerShape(10.dp),
-                            colors = ButtonDefaults.buttonColors(
-                                containerColor = MaterialTheme.colorScheme.primary,
-                                contentColor = MaterialTheme.colorScheme.onPrimary
-                            )
                         ) {
                             Text("Click here")
                         }
@@ -138,13 +134,6 @@ fun LoginScreen(
                         }
                     },
                     shape = RoundedCornerShape(12.dp),
-                    colors = OutlinedTextFieldDefaults.colors(
-                        focusedBorderColor = MaterialTheme.colorScheme.primary,
-                        unfocusedBorderColor = MaterialTheme.colorScheme.primary,
-                        cursorColor = MaterialTheme.colorScheme.primary,
-                        focusedLabelColor = MaterialTheme.colorScheme.primary,
-                        unfocusedLabelColor = MaterialTheme.colorScheme.primary
-                    )
                 )
 
                 Spacer(Modifier.height(20.dp))
@@ -164,13 +153,6 @@ fun LoginScreen(
                         }
                     },
                     shape = RoundedCornerShape(12.dp),
-                    colors = OutlinedTextFieldDefaults.colors(
-                        focusedBorderColor = MaterialTheme.colorScheme.primary,
-                        unfocusedBorderColor = MaterialTheme.colorScheme.primary,
-                        cursorColor = MaterialTheme.colorScheme.primary,
-                        focusedLabelColor = MaterialTheme.colorScheme.primary,
-                        unfocusedLabelColor = MaterialTheme.colorScheme.primary
-                    )
                 )
 
                 Spacer(Modifier.height(32.dp))
@@ -184,12 +166,7 @@ fun LoginScreen(
                     },
                     modifier = Modifier
                         .fillMaxWidth()
-                        .height(62.dp)
-                        .clip(RoundedCornerShape(14.dp)),
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = MaterialTheme.colorScheme.primary,
-                        contentColor = MaterialTheme.colorScheme.onPrimary
-                    )
+                        .height(60.dp),
                 ) {
                     Text("Login", style = MaterialTheme.typography.titleLarge)
                 }
