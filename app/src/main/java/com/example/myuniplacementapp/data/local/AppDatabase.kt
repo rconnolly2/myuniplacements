@@ -8,7 +8,8 @@ import androidx.room.TypeConverters
     entities = [
         UserEntity::class,
         AnnouncementEntity::class,
-        PlacementEntity::class
+        PlacementEntity::class,
+        ApplicationEntity::class
     ],
     version = 5,
     exportSchema = false
@@ -18,6 +19,7 @@ abstract class AppDatabase : RoomDatabase() {
     abstract fun userDao(): UserDao
     abstract fun announcementDao(): AnnouncementDao
     abstract fun placementDao(): PlacementDao
+    abstract fun applicationDao(): ApplicationDao
 }
 
 

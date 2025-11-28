@@ -10,40 +10,49 @@ class ApplicationRemoteDataSource(
     private val applications = firestore.collection("applications")
 
     suspend fun saveApplication(app: ApplicationEntity) {
-        val model = ApplicationRemoteModel(
-            id = app.id,
+        val remote = ApplicationRemoteModel(
+            id = app.id.toInt(),
+            placementId = app.placementId.toInt(),
             userEmail = app.userEmail,
-            placementId = app.placementId,
+            coverLetter = app.coverLetter,
+            cvLink = app.cvLink,
             status = app.status
         )
-        applications.document(app.id).set(model).await()
+        applications.document(app.id).set(remote).await()
     }
 
     suspend fun getApplication(id: String): ApplicationEntity? {
         val snapshot = applications.document(id).get().await()
-        val model = snapshot.toObject(ApplicationRemoteModel::class.java) ?: return null
+        val remote = snapshot.toObject(ApplicationRemoteModel::class.java) ?: return null
+
         return ApplicationEntity(
-            id = model.id,
-            userEmail = model.userEmail,
-            placementId = model.placementId,
-            status = model.status
+            id = remote.id.toString(),
+            placementId = remote.placementId.toString(),
+            userEmail = remote.userEmail,
+            coverLetter = remote.coverLetter,
+            cvLink = remote.cvLink,
+            status = remote.status
         )
     }
 
-    suspend fun getAllApplications(): List<ApplicationEntity> {
-        val snapshot = applications.get().await()
+    suspend fun getUserApplications(email: String): List<ApplicationEntity> {
+        val snapshot = applications.whereEqualTo("userEmail", email).get().await()
+
         return snapshot.documents.mapNotNull { doc ->
-            val model = doc.toObject(ApplicationRemoteModel::class.java) ?: return@mapNotNull null
+            val remote = doc.toObject(ApplicationRemoteModel::class.java) ?: return@mapNotNull null
+
             ApplicationEntity(
-                id = model.id,
-                userEmail = model.userEmail,
-                placementId = model.placementId,
-                status = model.status
+                id = remote.id.toString(),
+                placementId = remote.placementId.toString(),
+                userEmail = remote.userEmail,
+                coverLetter = remote.coverLetter,
+                cvLink = remote.cvLink,
+                status = remote.status
             )
         }
     }
 
-    suspend fun deleteApplication(app: ApplicationEntity) {
-        applications.document(app.id).delete().await()
+    suspend fun delete(id: String) {
+        applications.document(id).delete().await()
     }
 }
