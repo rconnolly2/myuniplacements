@@ -6,7 +6,9 @@ import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.CalendarMonth
@@ -26,6 +28,8 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.*
+import androidx.core.net.toUri
+import com.example.myuniplacementapp.data.local.PlacementEntity
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -46,10 +50,12 @@ fun ApplyScreen(
     var sending by remember { mutableStateOf(false) }
     var showDatePicker by remember { mutableStateOf(false) }
 
-    val datePickerState = rememberDatePickerState()
-    val pickScreenshot = rememberLauncherForActivityResult(ActivityResultContracts.PickVisualMedia()) { screenshotUri = it }
+    val pickScreenshot = rememberLauncherForActivityResult(ActivityResultContracts.PickVisualMedia()) {
+        screenshotUri = it
+    }
 
-    val ctx = LocalContext.current
+    val datePickerState = rememberDatePickerState()
+    val context = LocalContext.current
     val scope = rememberCoroutineScope()
 
     if (showDatePicker) {
@@ -86,7 +92,10 @@ fun ApplyScreen(
                 .padding(pad)
                 .padding(horizontal = 20.dp)
                 .fillMaxSize()
+                .verticalScroll(rememberScrollState())
         ) {
+            Spacer(Modifier.height(22.dp))   // MORE TOP SPACE
+
             ApplyHeader(placement)
 
             Spacer(Modifier.height(26.dp))
@@ -117,22 +126,27 @@ fun ApplyScreen(
             Spacer(Modifier.height(28.dp))
 
             SubmitButton(
+                screenshotUri = screenshotUri,
+                appliedDate = appliedDate,
+                coverLetter = coverLetter,
                 sending = sending,
                 onClick = {
-                    if (screenshotUri != null && appliedDate != null && coverLetter.isNotBlank()) {
-                        sending = true
-                        scope.launch {
-                            val bytes = ctx.contentResolver.openInputStream(screenshotUri!!)!!.readBytes()
-                            viewModel.submitApplication(
-                                placementId,
-                                userEmail,
-                                coverLetter,
-                                bytes,
-                                appliedDate!!
-                            )
-                            delay(600)
-                            onApplicationSent()
-                        }
+                    sending = true
+                    scope.launch {
+                        val bytes = context.contentResolver
+                            .openInputStream(screenshotUri!!)!!
+                            .readBytes()
+
+                        viewModel.submitApplication(
+                            placementId,
+                            userEmail,
+                            coverLetter,
+                            bytes,
+                            appliedDate!!
+                        )
+
+                        delay(600)
+                        onApplicationSent()
                     }
                 }
             )
@@ -141,34 +155,68 @@ fun ApplyScreen(
 }
 
 @Composable
-fun ApplyHeader(placement: com.example.myuniplacementapp.data.local.PlacementEntity?) {
+fun ApplyHeader(placement: PlacementEntity?) {
     if (placement == null) return
-    Row(
+
+    val website = "https://google.es"
+    val context = LocalContext.current
+
+    Column(
         modifier = Modifier
             .fillMaxWidth()
+            .height(200.dp)
             .clip(RoundedCornerShape(16.dp))
             .background(MaterialTheme.colorScheme.surfaceVariant)
             .padding(16.dp)
     ) {
-        SubcomposeAsyncImage(
-            model = placement.companyLogo,
-            contentDescription = null,
+        Row(
             modifier = Modifier
-                .size(70.dp)
-                .clip(RoundedCornerShape(12.dp)),
-            contentScale = ContentScale.Crop
-        )
-        Spacer(Modifier.width(16.dp))
-        Column {
-            Text(
-                placement.title,
-                style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.Bold)
+                .fillMaxWidth()
+                .height(IntrinsicSize.Min)
+        ) {
+            SubcomposeAsyncImage(
+                model = placement.companyLogo,
+                contentDescription = null,
+                modifier = Modifier
+                    .size(70.dp)
+                    .clip(RoundedCornerShape(12.dp)),
+                contentScale = ContentScale.Crop
             )
-            Text(
-                placement.description,
-                style = MaterialTheme.typography.bodyMedium,
-                maxLines = 2
-            )
+
+            Spacer(Modifier.width(16.dp))
+
+            Column(
+                modifier = Modifier.weight(1f)
+            ) {
+                Text(
+                    placement.title,
+                    style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.Bold),
+                    maxLines = 1
+                )
+
+                OutlinedButton(
+                    onClick = {
+                        val intent = android.content.Intent(android.content.Intent.ACTION_VIEW)
+                        intent.data = website.toUri()
+                        androidx.core.content.ContextCompat.startActivity(context, intent, null)
+                    },
+                    modifier = Modifier
+                        .padding(top = 6.dp)
+                        .height(38.dp)
+                ) {
+                    Text("Visit Website")
+                }
+            }
+        }
+
+        Spacer(Modifier.height(12.dp))
+
+        Box(
+            modifier = Modifier
+                .weight(1f)
+                .verticalScroll(rememberScrollState())
+        ) {
+            Text(placement.description, style = MaterialTheme.typography.bodyMedium)
         }
     }
 }
@@ -227,9 +275,18 @@ fun CoverLetterBox(value: String, onChange: (String) -> Unit) {
 }
 
 @Composable
-fun SubmitButton(sending: Boolean, onClick: () -> Unit) {
+fun SubmitButton(
+    screenshotUri: Uri?,
+    appliedDate: Long?,
+    coverLetter: String,
+    sending: Boolean,
+    onClick: () -> Unit
+) {
+    val isValid = screenshotUri != null && appliedDate != null && coverLetter.isNotBlank()
+
     Button(
         onClick = onClick,
+        enabled = isValid && !sending,
         modifier = Modifier
             .fillMaxWidth()
             .height(54.dp),
