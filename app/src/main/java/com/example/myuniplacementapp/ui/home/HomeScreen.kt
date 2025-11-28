@@ -18,6 +18,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavController
 import coil.compose.AsyncImage
 import com.example.myuniplacementapp.data.local.AnnouncementEntity
 import com.example.myuniplacementapp.viewmodel.AnnouncementViewModel
@@ -26,7 +27,8 @@ import com.example.myuniplacementapp.viewmodel.PlacementViewModel
 @Composable
 fun HomeScreen(
     placementViewModel: PlacementViewModel,
-    announcementViewModel: AnnouncementViewModel
+    announcementViewModel: AnnouncementViewModel,
+    navController: NavController
 ) {
     val announcements by announcementViewModel.announcements.collectAsState()
     val placements by placementViewModel.placements.collectAsState()
@@ -96,6 +98,9 @@ fun HomeScreen(
                             RoundedCornerShape(18.dp)
                         )
                         .padding(16.dp)
+                        .clickable {
+                            navController.navigate("apply/${placement.id}")
+                        }
                 ) {
                     AsyncImage(
                         model = placement.companyLogo,

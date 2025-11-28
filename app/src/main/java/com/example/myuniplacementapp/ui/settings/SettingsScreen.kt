@@ -9,8 +9,12 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import com.example.myuniplacementapp.ui.theme.DarkGold
+import com.example.myuniplacementapp.ui.theme.Gold
+import com.example.myuniplacementapp.ui.theme.Gray
 import com.example.myuniplacementapp.viewmodel.SettingsViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -45,7 +49,14 @@ fun SettingsScreen(navController: NavController, viewModel: SettingsViewModel) {
                 Text("Dark Mode")
                 Switch(
                     checked = isDark,
-                    onCheckedChange = { viewModel.toggleTheme() }
+                    onCheckedChange = { viewModel.toggleTheme() },
+                    colors = SwitchDefaults.colors(
+                        checkedThumbColor = Gold,
+                        checkedTrackColor = DarkGold,
+
+                        uncheckedThumbColor = Gray,
+                        uncheckedTrackColor = Color(0xFFE5E5E5), // NOT lavender
+                    )
                 )
             }
         }

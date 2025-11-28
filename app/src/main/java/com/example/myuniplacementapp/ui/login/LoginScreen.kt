@@ -2,6 +2,7 @@ package com.example.myuniplacementapp.ui.login
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -19,6 +20,8 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.myuniplacementapp.R
+import com.example.myuniplacementapp.ui.theme.Black
+import com.example.myuniplacementapp.ui.theme.White
 import com.example.myuniplacementapp.viewmodel.*
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -97,14 +100,23 @@ fun LoginScreen(
                             style = MaterialTheme.typography.bodyLarge,
                             color = MaterialTheme.colorScheme.onSecondary,
                             modifier = Modifier.fillMaxWidth(),
-                            textAlign = androidx.compose.ui.text.style.TextAlign.Center
+                            textAlign = TextAlign.Center
                         )
 
                         Spacer(Modifier.height(24.dp))
 
+                        val isLight = isSystemInDarkTheme()
                         Button(
                             onClick = onClickGoToRegister,
                             shape = RoundedCornerShape(10.dp),
+                            colors = if (!isLight) {
+                                ButtonDefaults.buttonColors(
+                                    containerColor = Black,
+                                    contentColor = White
+                                )
+                            } else {
+                                ButtonDefaults.buttonColors()
+                            }
                         ) {
                             Text("Click here")
                         }
@@ -167,6 +179,7 @@ fun LoginScreen(
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(60.dp),
+                    shape = RoundedCornerShape(14.dp),
                 ) {
                     Text("Login", style = MaterialTheme.typography.titleLarge)
                 }

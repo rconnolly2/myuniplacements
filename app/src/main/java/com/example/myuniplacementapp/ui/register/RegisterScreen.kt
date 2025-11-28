@@ -3,6 +3,7 @@ package com.example.myuniplacementapp.ui.register
 import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -20,6 +21,8 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.myuniplacementapp.R
+import com.example.myuniplacementapp.ui.theme.Black
+import com.example.myuniplacementapp.ui.theme.White
 import com.example.myuniplacementapp.viewmodel.*
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -110,11 +113,18 @@ fun RegisterScreen(
 
                         Spacer(Modifier.height(20.dp))
 
+                        val isLight = isSystemInDarkTheme()
                         Button(
                             onClick = onGoToLogin,
-                            colors = ButtonDefaults.buttonColors(
-                                containerColor = MaterialTheme.colorScheme.primary
-                            )
+                            shape = RoundedCornerShape(10.dp),
+                            colors = if (!isLight) {
+                                ButtonDefaults.buttonColors(
+                                    containerColor = Black,
+                                    contentColor = White
+                                )
+                            } else {
+                                ButtonDefaults.buttonColors()
+                            }
                         ) { Text("Click here") }
                     }
                 }

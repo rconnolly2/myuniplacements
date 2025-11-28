@@ -9,6 +9,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.navigation.compose.*
+import com.example.myuniplacementapp.ui.application.ApplyScreen
 import com.example.myuniplacementapp.ui.components.DrawerContent
 import kotlinx.coroutines.launch
 import com.example.myuniplacementapp.viewmodel.UserViewModel
@@ -17,6 +18,7 @@ import com.example.myuniplacementapp.ui.home.HomeScreen
 import com.example.myuniplacementapp.ui.profile.ProfileScreen
 import com.example.myuniplacementapp.ui.settings.SettingsScreen
 import com.example.myuniplacementapp.viewmodel.AnnouncementViewModel
+import com.example.myuniplacementapp.viewmodel.ApplicationViewModel
 import com.example.myuniplacementapp.viewmodel.LoginViewModel
 import com.example.myuniplacementapp.viewmodel.PlacementViewModel
 
@@ -27,7 +29,8 @@ fun UserApp(
     settingsViewModel: SettingsViewModel,
     loginViewModel: LoginViewModel,
     placementViewModel: PlacementViewModel,
-    announcementViewModel: AnnouncementViewModel
+    announcementViewModel: AnnouncementViewModel,
+    applicationViewModel: ApplicationViewModel
 ) {
     val navController = rememberNavController()
     val drawerState = rememberDrawerState(DrawerValue.Closed)
@@ -57,7 +60,9 @@ fun UserApp(
     ) {
         Scaffold(
             topBar = {
-                if (currentRoute != "profile") {
+                val route = currentRoute ?: ""
+
+                if (route != "profile" && !route.startsWith("apply")) {
                     CenterAlignedTopAppBar(
                         title = { Text("MyUniPlacements") },
                         navigationIcon = {
@@ -77,7 +82,8 @@ fun UserApp(
                 composable("home") {
                     HomeScreen(
                         placementViewModel = placementViewModel,
-                        announcementViewModel = announcementViewModel
+                        announcementViewModel = announcementViewModel,
+                        navController = navController
                     )
                 }
                 composable("profile") {
@@ -94,6 +100,17 @@ fun UserApp(
                 }
                 composable("settings") {
                     SettingsScreen(navController, settingsViewModel)
+                }
+                composable("apply/{placementId}") { backStackEntry ->
+                    val placementId = backStackEntry.arguments?.getString("placementId") ?: ""
+                    ApplyScreen(
+                        placementId = placementId,
+                        userEmail = userViewModel.user.value?.email ?: "",
+                        placementViewModel = placementViewModel,
+                        viewModel = applicationViewModel,
+                        onBack = { navController.popBackStack() },
+                        onApplicationSent = { navController.popBackStack() }
+                    )
                 }
             }
         }

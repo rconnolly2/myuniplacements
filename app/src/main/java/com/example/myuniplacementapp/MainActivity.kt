@@ -15,14 +15,16 @@ import com.example.myuniplacementapp.viewmodel.LoginViewModel
 import com.example.myuniplacementapp.data.local.AppDatabase
 import com.example.myuniplacementapp.data.prefs.UserPreferencesRepository
 import com.example.myuniplacementapp.data.remote.AnnouncementRemoteDataSource
+import com.example.myuniplacementapp.data.remote.ApplicationRemoteDataSource
+import com.example.myuniplacementapp.data.remote.FileRemoteDataSource
 import com.example.myuniplacementapp.data.remote.PlacementRemoteDataSource
 import com.example.myuniplacementapp.data.remote.UserRemoteDataSource
+import com.example.myuniplacementapp.data.repository.ApplicationRepository
 import com.example.myuniplacementapp.repository.AnnouncementRepository
 import com.example.myuniplacementapp.repository.PlacementRepository
 import com.example.myuniplacementapp.repository.UserRepository
 import com.example.myuniplacementapp.ui.UserApp
 import com.example.myuniplacementapp.ui.auth.AuthHost
-import com.example.myuniplacementapp.ui.login.LoginScreen
 import com.example.myuniplacementapp.ui.theme.UserAppTheme
 import com.example.myuniplacementapp.viewmodel.LoginState
 import com.example.myuniplacementapp.viewmodel.SettingsViewModel
@@ -32,6 +34,8 @@ import com.example.myuniplacementapp.viewmodel.UserViewModelFactory
 import com.example.myuniplacementapp.utils.NetworkUtils
 import com.example.myuniplacementapp.viewmodel.AnnouncementViewModel
 import com.example.myuniplacementapp.viewmodel.AnnouncementViewModelFactory
+import com.example.myuniplacementapp.viewmodel.ApplicationViewModel
+import com.example.myuniplacementapp.viewmodel.ApplicationViewModelFactory
 import com.example.myuniplacementapp.viewmodel.PlacementViewModel
 import com.example.myuniplacementapp.viewmodel.PlacementViewModelFactory
 import kotlin.jvm.java
@@ -72,6 +76,15 @@ class MainActivity : ComponentActivity() {
         val placementFactory = PlacementViewModelFactory(placementRepository)
         val placementViewModel: PlacementViewModel by viewModels { placementFactory }
 
+        val applicationRepository = ApplicationRepository(
+            dao = db.applicationDao(),
+            remote = ApplicationRemoteDataSource(),
+            fileRemote = FileRemoteDataSource(),
+            isOnline = { NetworkUtils.isOnline(this) }
+        )
+        val applicationFactory = ApplicationViewModelFactory(applicationRepository)
+        val applicationViewModel: ApplicationViewModel by viewModels { applicationFactory }
+
         val announcementRepository = AnnouncementRepository(
             dao = db.announcementDao(),
             remote = AnnouncementRemoteDataSource(),
@@ -92,6 +105,7 @@ class MainActivity : ComponentActivity() {
                         loginViewModel = loginViewModel,
                         placementViewModel = placementViewModel,
                         announcementViewModel = announcementViewModel,
+                        applicationViewModel = applicationViewModel
                     )
                 } else {
                     AuthHost(

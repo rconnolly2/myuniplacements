@@ -10,6 +10,7 @@ data class ApplicationEntity(
     val placementId: String,
     val userEmail: String,
     val coverLetter: String,
-    val cvLink: String,
+    val screenshotUrl: String,
+    val appliedDate: Long,
     val status: ApplicationStatus = ApplicationStatus.APPLIED
 )

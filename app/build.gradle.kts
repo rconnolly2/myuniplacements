@@ -43,6 +43,9 @@ android {
 }
 
 dependencies {
+    // Firebase Storage
+    implementation("com.google.firebase:firebase-storage-ktx")
+
     implementation("io.coil-kt:coil-compose:2.6.0")
 
     coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.0.4")

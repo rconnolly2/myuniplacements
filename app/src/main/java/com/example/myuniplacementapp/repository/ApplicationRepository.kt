@@ -1,47 +1,41 @@
-package com.example.myuniplacementapp.repository
+package com.example.myuniplacementapp.data.repository
 
 import com.example.myuniplacementapp.data.local.ApplicationDao
 import com.example.myuniplacementapp.data.local.ApplicationEntity
 import com.example.myuniplacementapp.data.remote.ApplicationRemoteDataSource
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.onStart
+import com.example.myuniplacementapp.data.remote.FileRemoteDataSource
 
 class ApplicationRepository(
     private val dao: ApplicationDao,
     private val remote: ApplicationRemoteDataSource,
+    private val fileRemote: FileRemoteDataSource,
     private val isOnline: () -> Boolean
 ) {
+    suspend fun submitApplication(
+        placementId: String,
+        userEmail: String,
+        coverLetter: String,
+        screenshotBytes: ByteArray,
+        appliedDate: Long
+    ) {
+        val id = System.currentTimeMillis().toString()
 
-    fun getUserApplications(email: String): Flow<List<ApplicationEntity>> =
-        dao.getUserApplications(email).onStart {
-            if (isOnline()) {
-                val list = remote.getUserApplications(email)
-                list.forEach { dao.insertApplication(it) }
-            }
-        }
+        val screenshotUrl =
+            if (isOnline()) fileRemote.uploadScreenshot(screenshotBytes) else ""
 
-    suspend fun getApplication(id: String): ApplicationEntity? {
-        return if (isOnline()) {
-            val item = remote.getApplication(id)
-            if (item != null) dao.insertApplication(item)
-            item
-        } else {
-            dao.getApplicationById(id)
-        }
-    }
+        val app = ApplicationEntity(
+            id = id,
+            placementId = placementId,
+            userEmail = userEmail,
+            coverLetter = coverLetter,
+            screenshotUrl = screenshotUrl,
+            appliedDate = appliedDate
+        )
 
-    suspend fun insertApplication(app: ApplicationEntity) {
+        if (isOnline()) remote.saveApplication(app)
         dao.insertApplication(app)
-        if (isOnline()) remote.saveApplication(app)
     }
 
-    suspend fun updateApplication(app: ApplicationEntity) {
-        dao.updateApplication(app)
-        if (isOnline()) remote.saveApplication(app)
-    }
-
-    suspend fun deleteApplication(app: ApplicationEntity) {
-        dao.deleteApplication(app)
-        if (isOnline()) remote.delete(app.id)
-    }
+    fun getUserApplications(email: String) =
+        dao.getUserApplications(email)
 }
