@@ -43,6 +43,9 @@ android {
 }
 
 dependencies {
+    // I need Material 1.12.0 for Theme.Material3.DayNight.NoActionBar in themes.xml
+    implementation("com.google.android.material:material:1.12.0")
+
     // Firebase Storage
     implementation("com.google.firebase:firebase-storage-ktx")
 
