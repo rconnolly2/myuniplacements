@@ -10,6 +10,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.navigation.compose.*
 import com.example.myuniplacementapp.ui.application.ApplyScreen
+import com.example.myuniplacementapp.ui.applications.MyApplicationsScreen
 import com.example.myuniplacementapp.ui.components.DrawerContent
 import kotlinx.coroutines.launch
 import com.example.myuniplacementapp.viewmodel.UserViewModel
@@ -62,7 +63,7 @@ fun UserApp(
             topBar = {
                 val route = currentRoute ?: ""
 
-                if (route != "profile" && !route.startsWith("apply")) {
+                if (route != "profile" && !route.startsWith("apply") && route != "my_applications") {
                     CenterAlignedTopAppBar(
                         title = { Text("MyUniPlacements") },
                         navigationIcon = {
@@ -93,10 +94,13 @@ fun UserApp(
                     )
                 }
                 composable("my_applications") {
-                    // TODO
-                }
-                composable("my_applications") {
-                    // TODO
+                    MyApplicationsScreen(
+                        userEmail = "robertoconnolly100@gmail.com",
+                        applicationViewModel = applicationViewModel,
+                        placementViewModel = placementViewModel,
+                        onOpenDetails = {},
+                        onBack = { navController.popBackStack() }
+                    )
                 }
                 composable("settings") {
                     SettingsScreen(navController, settingsViewModel)

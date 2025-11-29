@@ -8,38 +8,40 @@ import java.time.LocalDate
 class PlacementRemoteDataSource(
     private val firestore: FirebaseFirestore = FirebaseFirestore.getInstance()
 ) {
-    private val placements = firestore.collection("placements")
+    private val col = firestore.collection("placements")
 
     suspend fun getPlacement(id: String): PlacementEntity? {
-        val snapshot = placements.document(id).get().await()
-        val model = snapshot.toObject(PlacementRemoteModel::class.java) ?: return null
+        val snap = col.document(id).get().await()
+        val model = snap.toObject(PlacementRemoteModel::class.java) ?: return null
         val added = model.addedDate.takeIf { it.isNotBlank() }?.let { LocalDate.parse(it) } ?: LocalDate.now()
         val modified = model.modifiedDate.takeIf { it.isNotBlank() }?.let { LocalDate.parse(it) } ?: LocalDate.now()
 
         return PlacementEntity(
-            id = model.id.toString(),
+            id = model.id,
             title = model.title,
             company = model.company,
             companyLogo = model.companyLogo,
             description = model.description,
+            location = model.location,
             addedDate = added,
             modifiedDate = modified
         )
     }
 
     suspend fun getAllPlacements(): List<PlacementEntity> {
-        val snapshot = placements.get().await()
-        return snapshot.documents.mapNotNull { doc ->
-            val model = doc.toObject(PlacementRemoteModel::class.java) ?: return@mapNotNull null
+        val snap = col.get().await()
+        return snap.documents.mapNotNull {
+            val model = it.toObject(PlacementRemoteModel::class.java) ?: return@mapNotNull null
             val added = model.addedDate.takeIf { it.isNotBlank() }?.let { LocalDate.parse(it) } ?: LocalDate.now()
             val modified = model.modifiedDate.takeIf { it.isNotBlank() }?.let { LocalDate.parse(it) } ?: LocalDate.now()
 
             PlacementEntity(
-                id = model.id.toString(),
+                id = model.id,
                 title = model.title,
                 company = model.company,
                 companyLogo = model.companyLogo,
                 description = model.description,
+                location = model.location,
                 addedDate = added,
                 modifiedDate = modified
             )

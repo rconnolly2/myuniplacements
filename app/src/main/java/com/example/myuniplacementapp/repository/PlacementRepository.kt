@@ -11,7 +11,6 @@ class PlacementRepository(
     private val remote: PlacementRemoteDataSource,
     private val isOnline: () -> Boolean
 ) {
-
     fun getAllPlacements(): Flow<List<PlacementEntity>> =
         dao.getAllPlacements().onStart {
             if (isOnline()) {

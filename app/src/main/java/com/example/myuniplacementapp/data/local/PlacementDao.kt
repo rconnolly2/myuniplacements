@@ -15,7 +15,7 @@ interface PlacementDao {
     suspend fun getPlacementById(id: String): PlacementEntity?
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insertPlacement(placement: PlacementEntity)
+    suspend fun insertPlacement(p: PlacementEntity)
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertPlacements(list: List<PlacementEntity>)

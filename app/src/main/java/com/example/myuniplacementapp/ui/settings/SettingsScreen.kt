@@ -55,7 +55,7 @@ fun SettingsScreen(navController: NavController, viewModel: SettingsViewModel) {
                         checkedTrackColor = DarkGold,
 
                         uncheckedThumbColor = Gray,
-                        uncheckedTrackColor = Color(0xFFE5E5E5), // NOT lavender
+                        uncheckedTrackColor = Color(0xFFE5E5E5),
                     )
                 )
             }

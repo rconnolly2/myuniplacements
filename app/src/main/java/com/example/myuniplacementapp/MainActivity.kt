@@ -2,11 +2,9 @@ package com.example.myuniplacementapp
 
 import android.content.Context
 import android.os.Bundle
-import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.datastore.preferences.preferencesDataStore
@@ -19,7 +17,7 @@ import com.example.myuniplacementapp.data.remote.ApplicationRemoteDataSource
 import com.example.myuniplacementapp.data.remote.FileRemoteDataSource
 import com.example.myuniplacementapp.data.remote.PlacementRemoteDataSource
 import com.example.myuniplacementapp.data.remote.UserRemoteDataSource
-import com.example.myuniplacementapp.data.repository.ApplicationRepository
+import com.example.myuniplacementapp.repository.ApplicationRepository
 import com.example.myuniplacementapp.repository.AnnouncementRepository
 import com.example.myuniplacementapp.repository.PlacementRepository
 import com.example.myuniplacementapp.repository.UserRepository

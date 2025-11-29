@@ -2,6 +2,7 @@ package com.example.myuniplacementapp.data.local
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
+import com.example.myuniplacementapp.data.model.LocationType
 import java.time.LocalDate
 
 @Entity(tableName = "placement_table")
@@ -12,5 +13,6 @@ data class PlacementEntity(
     val companyLogo: String,
     val description: String,
     val addedDate: LocalDate,
-    val modifiedDate: LocalDate
+    val modifiedDate: LocalDate,
+    val location: LocationType
 )

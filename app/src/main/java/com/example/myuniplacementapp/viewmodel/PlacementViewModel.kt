@@ -10,24 +10,27 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
-class PlacementViewModel(private val repository: PlacementRepository) : ViewModel() {
+class PlacementViewModel(private val repo: PlacementRepository) : ViewModel() {
 
     val placements: StateFlow<List<PlacementEntity>> =
-        repository.getAllPlacements().stateIn(viewModelScope, SharingStarted.Lazily, emptyList())
+        repo.getAllPlacements().stateIn(viewModelScope, SharingStarted.Lazily, emptyList())
 
     fun getPlacement(id: String) {
-        viewModelScope.launch {
-            repository.getPlacement(id)
-        }
+        viewModelScope.launch { repo.getPlacement(id) }
     }
+
+    fun filterByLocation(list: List<PlacementEntity>, loc: String): List<PlacementEntity> {
+        return if (loc == "All") list
+        else list.filter { it.location.name.equals(loc, ignoreCase = true) }
+    }
+
+    fun sortByModified(list: List<PlacementEntity>) =
+        list.sortedByDescending { it.modifiedDate }
 }
 
-class PlacementViewModelFactory(private val repository: PlacementRepository) : ViewModelProvider.Factory {
+class PlacementViewModelFactory(private val repo: PlacementRepository) :
+    ViewModelProvider.Factory {
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
-        if (modelClass.isAssignableFrom(PlacementViewModel::class.java)) {
-            @Suppress("UNCHECKED_CAST")
-            return PlacementViewModel(repository) as T
-        }
-        throw IllegalArgumentException("Unknown ViewModel class")
+        return PlacementViewModel(repo) as T
     }
 }
