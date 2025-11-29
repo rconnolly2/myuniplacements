@@ -1,6 +1,4 @@
-@file:OptIn(ExperimentalMaterial3Api::class)
-
-package com.example.myuniplacementapp.ui.applications
+package com.example.myuniplacementapp.ui.application
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -25,6 +23,7 @@ import com.example.myuniplacementapp.viewmodel.PlacementViewModel
 import com.example.myuniplacementapp.ui.theme.Gold
 import kotlinx.coroutines.launch
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ApplicationDetailsScreen(
     applicationId: String,

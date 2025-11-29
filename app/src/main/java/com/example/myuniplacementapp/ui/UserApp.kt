@@ -9,15 +9,15 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.navigation.compose.*
-import androidx.navigation.navArgument
 import com.example.myuniplacementapp.ui.application.ApplyScreen
 import com.example.myuniplacementapp.ui.application.MyApplicationsScreen
-import com.example.myuniplacementapp.ui.applications.ApplicationDetailsScreen
+import com.example.myuniplacementapp.ui.application.ApplicationDetailsScreen
 import com.example.myuniplacementapp.ui.components.DrawerContent
 import kotlinx.coroutines.launch
 import com.example.myuniplacementapp.viewmodel.UserViewModel
 import com.example.myuniplacementapp.viewmodel.SettingsViewModel
 import com.example.myuniplacementapp.ui.home.HomeScreen
+import com.example.myuniplacementapp.ui.placements.PlacementsScreen
 import com.example.myuniplacementapp.ui.profile.ProfileScreen
 import com.example.myuniplacementapp.ui.settings.SettingsScreen
 import com.example.myuniplacementapp.viewmodel.AnnouncementViewModel
@@ -102,6 +102,12 @@ fun UserApp(
                         placementViewModel = placementViewModel,
                         onOpenDetails = { id -> navController.navigate("application_details/$id") },
                         onBack = { navController.popBackStack() }
+                    )
+                }
+                composable("placements") {
+                    PlacementsScreen(
+                        placementViewModel = placementViewModel,
+                        navController = navController
                     )
                 }
                 composable("settings") {

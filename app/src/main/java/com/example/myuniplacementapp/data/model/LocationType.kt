@@ -7,3 +7,9 @@ enum class LocationType {
     ERASMUS,
     OTHER
 }
+
+fun LocationType.pretty(): String {
+    return name.lowercase()
+        .replace("_", " ")
+        .replaceFirstChar { it.uppercase() }
+}
