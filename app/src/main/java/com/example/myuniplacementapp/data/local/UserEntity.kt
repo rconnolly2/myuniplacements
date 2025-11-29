@@ -10,6 +10,7 @@ data class UserEntity(
     val firstName: String,
     val lastName: String,
     val phoneNumber: String,
-    val dateOfBirth: LocalDate? = null,
-    val profileImageBlob: ByteArray? = null
+    val dateOfBirth: LocalDate?,
+    val profileImageUrl: String?,
+    val cvFileUrl: String?
 )

@@ -21,6 +21,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.myuniplacementapp.R
+import com.example.myuniplacementapp.data.local.UserEntity
 import com.example.myuniplacementapp.ui.theme.Black
 import com.example.myuniplacementapp.ui.theme.White
 import com.example.myuniplacementapp.ui.theme.isAppInDarkTheme
@@ -172,7 +173,7 @@ fun RegisterScreen(
                     onClick = {
                         if (password.isNotBlank() && email.isNotBlank() && password.isNotBlank() && firstName.isNotBlank() && lastName.isNotBlank()) {
                             loginViewModel.register(email, password)
-                            userViewModel.addUser(firstName, lastName, email)
+                            userViewModel.addUser(UserEntity(email, firstName, lastName, "", null, null, null))
                         }
                     },
                     modifier = Modifier

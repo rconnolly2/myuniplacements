@@ -1,6 +1,5 @@
 package com.example.myuniplacementapp.data.remote
 
-import android.util.Base64
 import com.example.myuniplacementapp.data.local.UserEntity
 import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.tasks.await
@@ -12,38 +11,34 @@ class UserRemoteDataSource(
     private val users = firestore.collection("users")
 
     suspend fun saveUserProfile(user: UserEntity) {
-        val blob = user.profileImageBlob?.let {
-            Base64.encodeToString(it, Base64.DEFAULT)
-        } ?: ""
 
-        val profile = UserProfile(
+        val model = UserRemoteModel(
             firstName = user.firstName,
             lastName = user.lastName,
             email = user.email,
             phoneNumber = user.phoneNumber,
             dateOfBirth = user.dateOfBirth?.toString() ?: "",
-            profileImageBlob = blob
+            profileImageUrl = user.profileImageUrl ?: "",
+            cvFileUrl = user.cvFileUrl ?: ""
         )
 
-        users.document(user.email).set(profile).await()
+        users.document(user.email).set(model).await()
     }
 
     suspend fun getUserProfile(email: String): UserEntity? {
         val snap = users.document(email).get().await()
-        val p = snap.toObject(UserProfile::class.java) ?: return null
+        val m = snap.toObject(UserRemoteModel::class.java) ?: return null
 
-        val dob = if (p.dateOfBirth.isNotBlank()) LocalDate.parse(p.dateOfBirth) else null
-        val bytes = if (p.profileImageBlob.isNotBlank())
-            Base64.decode(p.profileImageBlob, Base64.DEFAULT)
-        else null
+        val dob = if (m.dateOfBirth.isNotBlank()) LocalDate.parse(m.dateOfBirth) else null
 
         return UserEntity(
-            email = p.email,
-            firstName = p.firstName,
-            lastName = p.lastName,
-            phoneNumber = p.phoneNumber,
+            email = m.email,
+            firstName = m.firstName,
+            lastName = m.lastName,
+            phoneNumber = m.phoneNumber,
             dateOfBirth = dob,
-            profileImageBlob = bytes
+            profileImageUrl = m.profileImageUrl,
+            cvFileUrl = m.cvFileUrl
         )
     }
 
@@ -51,20 +46,18 @@ class UserRemoteDataSource(
         val snap = users.get().await()
 
         return snap.documents.mapNotNull { doc ->
-            val p = doc.toObject(UserProfile::class.java) ?: return@mapNotNull null
+            val m = doc.toObject(UserRemoteModel::class.java) ?: return@mapNotNull null
 
-            val dob = if (p.dateOfBirth.isNotBlank()) LocalDate.parse(p.dateOfBirth) else null
-            val bytes =
-                if (p.profileImageBlob.isNotBlank()) Base64.decode(p.profileImageBlob, Base64.DEFAULT)
-                else null
+            val dob = if (m.dateOfBirth.isNotBlank()) LocalDate.parse(m.dateOfBirth) else null
 
             UserEntity(
-                email = p.email,
-                firstName = p.firstName,
-                lastName = p.lastName,
-                phoneNumber = p.phoneNumber,
+                email = m.email,
+                firstName = m.firstName,
+                lastName = m.lastName,
+                phoneNumber = m.phoneNumber,
                 dateOfBirth = dob,
-                profileImageBlob = bytes
+                profileImageUrl = m.profileImageUrl,
+                cvFileUrl = m.cvFileUrl
             )
         }
     }

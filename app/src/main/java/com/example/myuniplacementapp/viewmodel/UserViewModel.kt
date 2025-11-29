@@ -11,13 +11,29 @@ import java.time.LocalDate
 
 class UserViewModel(private val repo: UserRepository) : ViewModel() {
 
-    val users = repo.getAllUsers()
-        .stateIn(viewModelScope, SharingStarted.Lazily, emptyList())
-
     private val _user = MutableStateFlow<UserEntity?>(null)
     val user = _user.asStateFlow()
 
-    fun getUserFlow(email: String): Flow<UserEntity?> = repo.getUserFlow(email)
+    val users = repo.getAllUsers()
+        .stateIn(viewModelScope, SharingStarted.Lazily, emptyList())
+
+    fun addUser(user: UserEntity) {
+        viewModelScope.launch {
+            repo.addUser(user)
+            _user.value = user
+        }
+    }
+
+    fun saveUser(
+        user: UserEntity,
+        imageBytes: ByteArray?,
+        cvBytes: ByteArray?
+    ) {
+        viewModelScope.launch {
+            val updated = repo.saveUser(user, imageBytes, cvBytes)
+            _user.value = updated
+        }
+    }
 
     fun getUser(email: String) {
         viewModelScope.launch {
@@ -25,40 +41,11 @@ class UserViewModel(private val repo: UserRepository) : ViewModel() {
         }
     }
 
-    fun saveUser(user: UserEntity) {
-        viewModelScope.launch {
-            repo.saveUser(user)
-            _user.value = user
-        }
-    }
-
-    fun addUser(
-        first: String,
-        last: String,
-        email: String,
-        phone: String = "",
-        dob: String = "",
-        image: ByteArray? = null
-    ) {
-        viewModelScope.launch {
-            val parsedDob = if (dob.isNotBlank()) LocalDate.parse(dob) else null
-            val user = UserEntity(
-                email = email,
-                firstName = first,
-                lastName = last,
-                phoneNumber = phone,
-                dateOfBirth = parsedDob,
-                profileImageBlob = image
-            )
-            repo.saveUser(user)
-            _user.value = user
-        }
-    }
+    fun getUserFlow(email: String): Flow<UserEntity?> =
+        repo.getUserFlow(email)
 
     fun deleteUser(user: UserEntity) {
-        viewModelScope.launch {
-            repo.deleteUser(user)
-        }
+        viewModelScope.launch { repo.deleteUser(user) }
     }
 }
 

@@ -61,6 +61,7 @@ class MainActivity : ComponentActivity() {
         val userRepository = UserRepository(
             dao = db.userDao(),
             remote = UserRemoteDataSource(),
+            fileRemote = FileRemoteDataSource(),
             isOnline = { NetworkUtils.isOnline(this) }
         )
         val userFactory = UserViewModelFactory(userRepository)

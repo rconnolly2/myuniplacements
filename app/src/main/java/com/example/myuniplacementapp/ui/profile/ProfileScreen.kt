@@ -9,9 +9,9 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.filled.ArrowBackIosNew
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Person
+import androidx.compose.material.icons.filled.UploadFile
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -20,11 +20,11 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
+import coil.compose.AsyncImage
 import com.example.myuniplacementapp.data.local.UserEntity
 import com.example.myuniplacementapp.viewmodel.UserViewModel
 import com.google.firebase.auth.FirebaseAuth
 import kotlinx.coroutines.launch
-import java.io.ByteArrayOutputStream
 import java.time.*
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -35,19 +35,21 @@ fun ProfileScreen(viewModel: UserViewModel, onBack: () -> Unit) {
     val email = FirebaseAuth.getInstance().currentUser?.email ?: return
     val user by viewModel.getUserFlow(email).collectAsState(initial = null)
 
-    val snackbarHost = remember { SnackbarHostState() }
+    val snackbar = remember { SnackbarHostState() }
     val scope = rememberCoroutineScope()
 
     var first by remember { mutableStateOf("") }
     var last by remember { mutableStateOf("") }
     var phone by remember { mutableStateOf("") }
     var dob by remember { mutableStateOf("") }
-    var image by remember { mutableStateOf<ByteArray?>(null) }
+
+    var imageBytes by remember { mutableStateOf<ByteArray?>(null) }
+    var cvBytes by remember { mutableStateOf<ByteArray?>(null) }
 
     var editing by remember { mutableStateOf(false) }
-    var showDatePicker by remember { mutableStateOf(false) }
+    var showPicker by remember { mutableStateOf(false) }
 
-    val datePickerState = rememberDatePickerState(initialSelectedDateMillis = null)
+    val dateState = rememberDatePickerState()
 
     LaunchedEffect(user) {
         user?.let {
@@ -55,24 +57,19 @@ fun ProfileScreen(viewModel: UserViewModel, onBack: () -> Unit) {
             last = it.lastName
             phone = it.phoneNumber
             dob = it.dateOfBirth?.toString() ?: ""
-            image = it.profileImageBlob
+            imageBytes = null
+            cvBytes = null
         }
     }
 
-    val galleryLauncher =
+    val pickImage =
         rememberLauncherForActivityResult(ActivityResultContracts.GetContent()) { uri ->
-            uri?.let {
-                image = context.contentResolver.openInputStream(it)?.readBytes()
-            }
+            imageBytes = uri?.let { context.contentResolver.openInputStream(it)?.readBytes() }
         }
 
-    val cameraLauncher =
-        rememberLauncherForActivityResult(ActivityResultContracts.TakePicturePreview()) { bmp ->
-            bmp?.let {
-                val stream = ByteArrayOutputStream()
-                it.compress(android.graphics.Bitmap.CompressFormat.PNG, 100, stream)
-                image = stream.toByteArray()
-            }
+    val pickCv =
+        rememberLauncherForActivityResult(ActivityResultContracts.GetContent()) { uri ->
+            cvBytes = uri?.let { context.contentResolver.openInputStream(it)?.readBytes() }
         }
 
     Scaffold(
@@ -81,7 +78,7 @@ fun ProfileScreen(viewModel: UserViewModel, onBack: () -> Unit) {
                 title = { Text("Profile") },
                 navigationIcon = {
                     IconButton(onClick = onBack) {
-                        Icon(Icons.Default.ArrowBackIosNew, null)
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, null)
                     }
                 },
                 actions = {
@@ -91,18 +88,22 @@ fun ProfileScreen(viewModel: UserViewModel, onBack: () -> Unit) {
                 }
             )
         },
-        snackbarHost = { SnackbarHost(snackbarHost) }
+        snackbarHost = { SnackbarHost(snackbar) }
     ) { pad ->
 
         Column(
-            modifier = Modifier
+            Modifier
                 .padding(pad)
                 .padding(20.dp)
                 .fillMaxWidth(),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
 
-            ProfileImage(image) { galleryLauncher.launch("image/*") }
+            ProfileImage(
+                imageBytes = imageBytes,
+                imageUrl = user?.profileImageUrl,
+                enabled = editing
+            ) { pickImage.launch("image/*") }
 
             Spacer(Modifier.height(24.dp))
 
@@ -110,40 +111,49 @@ fun ProfileScreen(viewModel: UserViewModel, onBack: () -> Unit) {
             ProfileField("Last Name", last, editing) { last = it }
             ProfileField("Phone", phone, editing) { phone = it }
 
-            DOBField(dob, editing) { showDatePicker = true }
+            DobField(dob, editing) { showPicker = true }
 
-            ProfileDatePickerDialog(
-                showDatePicker,
-                datePickerState,
-                { showDatePicker = false },
-                {
-                    datePickerState.selectedDateMillis?.let { picked ->
-                        dob = Instant.ofEpochMilli(picked)
-                            .atZone(ZoneId.systemDefault())
-                            .toLocalDate()
-                            .toString()
-                    }
-                    showDatePicker = false
+            DateDialog(
+                show = showPicker,
+                state = dateState,
+                onDismiss = { showPicker = false }
+            ) {
+                dateState.selectedDateMillis?.let {
+                    dob = Instant.ofEpochMilli(it)
+                        .atZone(ZoneId.systemDefault())
+                        .toLocalDate()
+                        .toString()
                 }
-            )
+                showPicker = false
+            }
 
             if (editing) {
+
+                Spacer(Modifier.height(12.dp))
+                Button(
+                    onClick = { pickCv.launch("application/pdf") }
+                ) {
+                    Icon(Icons.Default.UploadFile, contentDescription = null)
+                    Spacer(Modifier.width(8.dp))
+                    Text("Upload CV")
+                }
+
                 Spacer(Modifier.height(20.dp))
+
                 Button(
                     onClick = {
-                        viewModel.saveUser(
-                            UserEntity(
-                                email = email,
-                                firstName = first,
-                                lastName = last,
-                                phoneNumber = phone,
-                                dateOfBirth = if (dob.isNotBlank()) LocalDate.parse(dob) else null,
-                                profileImageBlob = image
-                            )
+                        val updated = UserEntity(
+                            email = email,
+                            firstName = first,
+                            lastName = last,
+                            phoneNumber = phone,
+                            dateOfBirth = if (dob.isNotBlank()) LocalDate.parse(dob) else null,
+                            profileImageUrl = user?.profileImageUrl,
+                            cvFileUrl = user?.cvFileUrl
                         )
-                        scope.launch {
-                            snackbarHost.showSnackbar("Profile saved successfully")
-                        }
+
+                        viewModel.saveUser(updated, imageBytes, cvBytes)
+                        scope.launch { snackbar.showSnackbar("Profile saved") }
                     },
                     modifier = Modifier.fillMaxWidth()
                 ) { Text("Save Changes") }
@@ -153,19 +163,27 @@ fun ProfileScreen(viewModel: UserViewModel, onBack: () -> Unit) {
 }
 
 @Composable
-fun ProfileImage(image: ByteArray?, onClick: () -> Unit) {
+fun ProfileImage(imageBytes: ByteArray?, imageUrl: String?, enabled: Boolean, onClick: () -> Unit) {
     Box(
-        modifier = Modifier
+        Modifier
             .size(120.dp)
             .clip(CircleShape)
-            .clickable { onClick() },
+            .clickable(enabled = enabled) { onClick() },
         contentAlignment = Alignment.Center
     ) {
-        if (image == null) {
-            Icon(Icons.Default.Person, null, Modifier.size(70.dp))
-        } else {
-            val bmp = BitmapFactory.decodeByteArray(image, 0, image.size)
-            Image(bmp.asImageBitmap(), null)
+        when {
+            imageBytes != null -> {
+                val bmp = BitmapFactory.decodeByteArray(imageBytes, 0, imageBytes.size)
+                Image(bmp.asImageBitmap(), null)
+            }
+            !imageUrl.isNullOrEmpty() -> {
+                AsyncImage(
+                    model = imageUrl,
+                    contentDescription = null,
+                    modifier = Modifier.fillMaxSize()
+                )
+            }
+            else -> Icon(Icons.Default.Person, null, Modifier.size(70.dp))
         }
     }
 }
@@ -182,36 +200,32 @@ fun ProfileField(label: String, value: String, enabled: Boolean, onChange: (Stri
 }
 
 @Composable
-fun DOBField(dob: String, editing: Boolean, onClick: () -> Unit) {
-
-    val active = OutlinedTextFieldDefaults.colors(
-        disabledBorderColor = MaterialTheme.colorScheme.onSurfaceVariant,
-        disabledLabelColor = MaterialTheme.colorScheme.onSurface,
-        disabledTextColor = MaterialTheme.colorScheme.onSurface
+fun DobField(value: String, editing: Boolean, onClick: () -> Unit) {
+    OutlinedTextField(
+        value = value,
+        onValueChange = {},
+        label = { Text("Date of Birth") },
+        readOnly = true,
+        enabled = editing,
+        trailingIcon = {
+            IconButton(
+                onClick = onClick,
+                enabled = editing
+            ) {
+                Icon(
+                    imageVector = Icons.Default.Edit,
+                    contentDescription = null
+                )
+            }
+        },
+        modifier = Modifier.fillMaxWidth()
     )
-
-    val inactive = OutlinedTextFieldDefaults.colors()
-
-    Box(
-        modifier = Modifier
-            .fillMaxWidth()
-            .clickable(enabled = editing) { onClick() }
-    ) {
-        OutlinedTextField(
-            value = dob,
-            onValueChange = {},
-            label = { Text("Date of Birth") },
-            readOnly = true,
-            enabled = false,
-            colors = if (editing) active else inactive,
-            modifier = Modifier.fillMaxWidth()
-        )
-    }
 }
+
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ProfileDatePickerDialog(
+fun DateDialog(
     show: Boolean,
     state: DatePickerState,
     onDismiss: () -> Unit,
@@ -222,8 +236,6 @@ fun ProfileDatePickerDialog(
             onDismissRequest = onDismiss,
             confirmButton = { TextButton(onClick = onConfirm) { Text("OK") } },
             dismissButton = { TextButton(onClick = onDismiss) { Text("Cancel") } }
-        ) {
-            DatePicker(state = state)
-        }
+        ) { DatePicker(state = state) }
     }
 }
