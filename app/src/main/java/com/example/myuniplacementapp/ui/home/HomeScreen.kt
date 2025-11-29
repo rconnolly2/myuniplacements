@@ -97,7 +97,7 @@ fun HomeScreen(
                     style = MaterialTheme.typography.headlineSmall.copy(fontSize = 22.sp)
                 )
                 Text(
-                    "→",
+                    "↓",
                     style = MaterialTheme.typography.headlineSmall.copy(fontSize = 30.sp)
                 )
             }

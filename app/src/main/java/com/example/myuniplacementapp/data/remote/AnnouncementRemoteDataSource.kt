@@ -14,50 +14,32 @@ class AnnouncementRemoteDataSource(
         val snapshot = announcements.document(id).get().await()
         val model = snapshot.toObject(AnnouncementRemoteModel::class.java) ?: return null
 
-        val added = model.addedDate
-            .takeIf { it.isNotBlank() }
-            ?.let { LocalDate.parse(it) }
-            ?: LocalDate.now()
-
-        val modified = model.modifiedDate
-            .takeIf { it.isNotBlank() }
-            ?.let { LocalDate.parse(it) }
-            ?: LocalDate.now()
-
         return AnnouncementEntity(
-            id = snapshot.id,
+            id = model.id,
             title = model.title,
             content = model.content,
             image = model.image,
-            addedDate = added,
-            modifiedDate = modified
+            addedDate = LocalDate.parse(model.addedDate),
+            modifiedDate = LocalDate.parse(model.modifiedDate)
         )
     }
 
     suspend fun getAllAnnouncements(): List<AnnouncementEntity> {
         val snapshot = announcements.get().await()
-
         return snapshot.documents.mapNotNull { doc ->
             val model = doc.toObject(AnnouncementRemoteModel::class.java) ?: return@mapNotNull null
-
-            val added = model.addedDate
-                .takeIf { it.isNotBlank() }
-                ?.let { LocalDate.parse(it) }
-                ?: LocalDate.now()
-
-            val modified = model.modifiedDate
-                .takeIf { it.isNotBlank() }
-                ?.let { LocalDate.parse(it) }
-                ?: LocalDate.now()
-
             AnnouncementEntity(
-                id = doc.id,
+                id = model.id,
                 title = model.title,
                 content = model.content,
                 image = model.image,
-                addedDate = added,
-                modifiedDate = modified
+                addedDate = LocalDate.parse(model.addedDate),
+                modifiedDate = LocalDate.parse(model.modifiedDate)
             )
         }
+    }
+
+    suspend fun saveAnnouncement(model: AnnouncementRemoteModel) {
+        announcements.document(model.id).set(model).await()
     }
 }
