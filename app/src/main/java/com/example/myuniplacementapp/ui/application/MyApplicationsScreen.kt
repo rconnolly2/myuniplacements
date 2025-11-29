@@ -1,9 +1,8 @@
-package com.example.myuniplacementapp.ui.applications
+package com.example.myuniplacementapp.ui.application
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.horizontalScroll
-import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
@@ -19,7 +18,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.luminance
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
 import coil.compose.SubcomposeAsyncImage
@@ -38,7 +36,7 @@ fun MyApplicationsScreen(
     applicationViewModel: ApplicationViewModel,
     placementViewModel: PlacementViewModel,
     onOpenDetails: (String) -> Unit,
-    onBack: () -> Unit
+    onBack: () -> Unit,
 ) {
     val placements by placementViewModel.placements.collectAsState()
     val applications by applicationViewModel.getUserApplications(userEmail)

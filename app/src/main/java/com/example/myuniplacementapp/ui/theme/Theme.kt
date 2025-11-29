@@ -23,7 +23,11 @@ private val LightColorScheme = lightColorScheme(
     surfaceVariant = LightGold,
     onSurfaceVariant = Black,
     outline = LightOutline,
-    outlineVariant = LightOutline
+    outlineVariant = LightOutline,
+
+    inverseSurface = Black,
+    inverseOnSurface = White,
+    inversePrimary = Gold
 )
 
 private val DarkColorScheme = darkColorScheme(
@@ -38,7 +42,11 @@ private val DarkColorScheme = darkColorScheme(
     surfaceVariant = DarkSurfaceVariant,
     onSurfaceVariant = OffWhite,
     outline = DarkOutline,
-    outlineVariant = DarkOutline
+    outlineVariant = DarkOutline,
+
+    inverseSurface = OffWhite,
+    inverseOnSurface = Black,
+    inversePrimary = Gold
 )
 
 @Composable

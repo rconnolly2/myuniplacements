@@ -8,3 +8,9 @@ enum class ApplicationStatus {
     INTERVIEW,
     OFFER
 }
+
+fun ApplicationStatus.pretty(): String {
+    return name.lowercase()
+        .replace("_", " ")
+        .replaceFirstChar { it.uppercase() }
+}

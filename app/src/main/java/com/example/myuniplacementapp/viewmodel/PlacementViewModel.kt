@@ -5,6 +5,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.example.myuniplacementapp.data.local.PlacementEntity
 import com.example.myuniplacementapp.repository.PlacementRepository
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.stateIn
@@ -15,8 +16,8 @@ class PlacementViewModel(private val repo: PlacementRepository) : ViewModel() {
     val placements: StateFlow<List<PlacementEntity>> =
         repo.getAllPlacements().stateIn(viewModelScope, SharingStarted.Lazily, emptyList())
 
-    fun getPlacement(id: String) {
-        viewModelScope.launch { repo.getPlacement(id) }
+    suspend fun getPlacement(id: String): PlacementEntity? {
+        return repo.getPlacement(id)
     }
 
     fun filterByLocation(list: List<PlacementEntity>, loc: String): List<PlacementEntity> {

@@ -9,8 +9,10 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.navigation.compose.*
+import androidx.navigation.navArgument
 import com.example.myuniplacementapp.ui.application.ApplyScreen
-import com.example.myuniplacementapp.ui.applications.MyApplicationsScreen
+import com.example.myuniplacementapp.ui.application.MyApplicationsScreen
+import com.example.myuniplacementapp.ui.applications.ApplicationDetailsScreen
 import com.example.myuniplacementapp.ui.components.DrawerContent
 import kotlinx.coroutines.launch
 import com.example.myuniplacementapp.viewmodel.UserViewModel
@@ -63,7 +65,7 @@ fun UserApp(
             topBar = {
                 val route = currentRoute ?: ""
 
-                if (route != "profile" && !route.startsWith("apply") && route != "my_applications") {
+                if (route != "profile" && !route.startsWith("apply") && !route.startsWith("application_details") && route != "my_applications") {
                     CenterAlignedTopAppBar(
                         title = { Text("MyUniPlacements") },
                         navigationIcon = {
@@ -98,7 +100,7 @@ fun UserApp(
                         userEmail = "robertoconnolly100@gmail.com",
                         applicationViewModel = applicationViewModel,
                         placementViewModel = placementViewModel,
-                        onOpenDetails = {},
+                        onOpenDetails = { id -> navController.navigate("application_details/$id") },
                         onBack = { navController.popBackStack() }
                     )
                 }
@@ -113,7 +115,22 @@ fun UserApp(
                         placementViewModel = placementViewModel,
                         viewModel = applicationViewModel,
                         onBack = { navController.popBackStack() },
-                        onApplicationSent = { navController.popBackStack() }
+                        onApplicationSent = {
+                            navController.previousBackStackEntry
+                                ?.savedStateHandle
+                                ?.set("applied", true)
+
+                            navController.popBackStack()
+                        }
+                    )
+                }
+                composable("application_details/{id}") { backStackEntry ->
+                    val id = backStackEntry.arguments?.getString("id") ?: ""
+                    ApplicationDetailsScreen(
+                        applicationId = id,
+                        applicationViewModel = applicationViewModel,
+                        placementViewModel = placementViewModel,
+                        onBack = { navController.popBackStack() }
                     )
                 }
             }

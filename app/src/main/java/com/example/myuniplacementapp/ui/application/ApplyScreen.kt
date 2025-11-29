@@ -21,6 +21,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.core.content.ContextCompat
 import coil.compose.SubcomposeAsyncImage
 import com.example.myuniplacementapp.viewmodel.ApplicationViewModel
 import com.example.myuniplacementapp.viewmodel.PlacementViewModel
@@ -94,7 +95,7 @@ fun ApplyScreen(
                 .fillMaxSize()
                 .verticalScroll(rememberScrollState())
         ) {
-            Spacer(Modifier.height(22.dp))   // MORE TOP SPACE
+            Spacer(Modifier.height(22.dp))
 
             ApplyHeader(placement)
 
@@ -198,7 +199,7 @@ fun ApplyHeader(placement: PlacementEntity?) {
                     onClick = {
                         val intent = android.content.Intent(android.content.Intent.ACTION_VIEW)
                         intent.data = website.toUri()
-                        androidx.core.content.ContextCompat.startActivity(context, intent, null)
+                        ContextCompat.startActivity(context, intent, null)
                     },
                     modifier = Modifier
                         .padding(top = 6.dp)

@@ -30,112 +30,132 @@ fun HomeScreen(
     announcementViewModel: AnnouncementViewModel,
     navController: NavController
 ) {
-    val announcements by announcementViewModel.announcements.collectAsState()
-    val placements by placementViewModel.placements.collectAsState()
-    var selectedAnnouncement by remember { mutableStateOf<AnnouncementEntity?>(null) }
+    val snackbarHostState = remember { SnackbarHostState() }
 
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(horizontal = 16.dp)
-    ) {
-        Spacer(Modifier.height(10.dp))
+    val applied = navController.currentBackStackEntry
+        ?.savedStateHandle
+        ?.get<Boolean>("applied") == true
 
-        Text(
-            "Home",
-            style = MaterialTheme.typography.headlineMedium,
-            modifier = Modifier.padding(start = 4.dp, bottom = 10.dp)
-        )
-
-        LazyRow(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.spacedBy(18.dp),
-            contentPadding = PaddingValues(horizontal = 4.dp)
-        ) {
-            items(announcements) { ann ->
-                AsyncImage(
-                    model = ann.image,
-                    contentDescription = null,
-                    modifier = Modifier
-                        .size(width = 300.dp, height = 170.dp)
-                        .clip(RoundedCornerShape(22.dp))
-                        .clickable { selectedAnnouncement = ann },
-                    contentScale = ContentScale.Crop
-                )
-            }
-        }
-
-        Spacer(Modifier.height(26.dp))
-
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Text(
-                "Local Placements",
-                style = MaterialTheme.typography.headlineSmall.copy(fontSize = 22.sp)
-            )
-            Text(
-                "→",
-                style = MaterialTheme.typography.headlineSmall.copy(fontSize = 30.sp)
-            )
-        }
-
-        Spacer(Modifier.height(14.dp))
-
-        LazyColumn(
-            modifier = Modifier.fillMaxSize(),
-            verticalArrangement = Arrangement.spacedBy(18.dp)
-        ) {
-            items(placements) { placement ->
-
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .background(
-                            MaterialTheme.colorScheme.secondary.copy(alpha = 0.92f),
-                            RoundedCornerShape(18.dp)
-                        )
-                        .padding(16.dp)
-                        .clickable {
-                            navController.navigate("apply/${placement.id}")
-                        }
-                ) {
-                    AsyncImage(
-                        model = placement.companyLogo,
-                        contentDescription = null,
-                        modifier = Modifier
-                            .size(70.dp)
-                            .clip(RoundedCornerShape(12.dp)),
-                        contentScale = ContentScale.Crop
-                    )
-
-                    Spacer(Modifier.width(16.dp))
-
-                    Column(modifier = Modifier.weight(1f)) {
-                        Text(
-                            placement.title,
-                            style = MaterialTheme.typography.titleMedium,
-                            maxLines = 1,
-                            overflow = TextOverflow.Ellipsis
-                        )
-                        Text(
-                            placement.description,
-                            style = MaterialTheme.typography.bodyMedium,
-                            maxLines = 2,
-                            overflow = TextOverflow.Ellipsis
-                        )
-                    }
-                }
-            }
+    LaunchedEffect(applied) {
+        if (applied) {
+            snackbarHostState.showSnackbar("Application submitted successfully")
+            navController.currentBackStackEntry
+                ?.savedStateHandle
+                ?.remove<Boolean>("applied")
         }
     }
 
-    AnnouncementPopup(
-        announcement = selectedAnnouncement,
-        onDismiss = { selectedAnnouncement = null }
-    )
+    Scaffold(
+        snackbarHost = { SnackbarHost(snackbarHostState) }
+    ) { innerPad ->
+
+        val announcements by announcementViewModel.announcements.collectAsState()
+        val placements by placementViewModel.placements.collectAsState()
+        var selectedAnnouncement by remember { mutableStateOf<AnnouncementEntity?>(null) }
+
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(innerPad)
+                .padding(horizontal = 16.dp)
+        ) {
+            Spacer(Modifier.height(10.dp))
+
+            Text(
+                "Home",
+                style = MaterialTheme.typography.headlineMedium,
+                modifier = Modifier.padding(start = 4.dp, bottom = 10.dp)
+            )
+
+            LazyRow(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(18.dp),
+                contentPadding = PaddingValues(horizontal = 4.dp)
+            ) {
+                items(announcements) { ann ->
+                    AsyncImage(
+                        model = ann.image,
+                        contentDescription = null,
+                        modifier = Modifier
+                            .size(width = 300.dp, height = 170.dp)
+                            .clip(RoundedCornerShape(22.dp))
+                            .clickable { selectedAnnouncement = ann },
+                        contentScale = ContentScale.Crop
+                    )
+                }
+            }
+
+            Spacer(Modifier.height(26.dp))
+
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(
+                    "Local Placements",
+                    style = MaterialTheme.typography.headlineSmall.copy(fontSize = 22.sp)
+                )
+                Text(
+                    "→",
+                    style = MaterialTheme.typography.headlineSmall.copy(fontSize = 30.sp)
+                )
+            }
+
+            Spacer(Modifier.height(14.dp))
+
+            LazyColumn(
+                modifier = Modifier.fillMaxSize(),
+                verticalArrangement = Arrangement.spacedBy(18.dp)
+            ) {
+                items(placements) { placement ->
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .background(
+                                MaterialTheme.colorScheme.secondary.copy(alpha = 0.92f),
+                                RoundedCornerShape(18.dp)
+                            )
+                            .padding(16.dp)
+                            .clickable {
+                                navController.navigate("apply/${placement.id}")
+                            }
+                    ) {
+                        AsyncImage(
+                            model = placement.companyLogo,
+                            contentDescription = null,
+                            modifier = Modifier
+                                .size(70.dp)
+                                .clip(RoundedCornerShape(12.dp)),
+                            contentScale = ContentScale.Crop
+                        )
+
+                        Spacer(Modifier.width(16.dp))
+
+                        Column(modifier = Modifier.weight(1f)) {
+                            Text(
+                                placement.title,
+                                style = MaterialTheme.typography.titleMedium,
+                                maxLines = 1,
+                                overflow = TextOverflow.Ellipsis
+                            )
+                            Text(
+                                placement.description,
+                                style = MaterialTheme.typography.bodyMedium,
+                                maxLines = 2,
+                                overflow = TextOverflow.Ellipsis
+                            )
+                        }
+                    }
+                }
+            }
+
+            AnnouncementPopup(
+                announcement = selectedAnnouncement,
+                onDismiss = { selectedAnnouncement = null }
+            )
+        }
+    }
 }
 
 @Composable
