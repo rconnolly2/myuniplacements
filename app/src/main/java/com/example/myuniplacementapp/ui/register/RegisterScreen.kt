@@ -23,6 +23,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.myuniplacementapp.R
 import com.example.myuniplacementapp.ui.theme.Black
 import com.example.myuniplacementapp.ui.theme.White
+import com.example.myuniplacementapp.ui.theme.isAppInDarkTheme
 import com.example.myuniplacementapp.viewmodel.*
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -113,11 +114,11 @@ fun RegisterScreen(
 
                         Spacer(Modifier.height(20.dp))
 
-                        val isLight = isSystemInDarkTheme()
+                        val isDark = isAppInDarkTheme()
                         Button(
                             onClick = onGoToLogin,
                             shape = RoundedCornerShape(10.dp),
-                            colors = if (!isLight) {
+                            colors = if (isDark) {
                                 ButtonDefaults.buttonColors(
                                     containerColor = Black,
                                     contentColor = White
