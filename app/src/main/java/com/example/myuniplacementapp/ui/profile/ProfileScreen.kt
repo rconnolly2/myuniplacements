@@ -11,13 +11,15 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Person
-import androidx.compose.material.icons.filled.UploadFile
+import androidx.compose.material.icons.filled.PhotoCamera
+import androidx.compose.material.icons.filled.Upload
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.asImageBitmap
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
@@ -42,11 +44,10 @@ fun ProfileScreen(viewModel: UserViewModel, onBack: () -> Unit) {
     var last by remember { mutableStateOf("") }
     var phone by remember { mutableStateOf("") }
     var dob by remember { mutableStateOf("") }
-
     var imageBytes by remember { mutableStateOf<ByteArray?>(null) }
     var cvBytes by remember { mutableStateOf<ByteArray?>(null) }
-
     var editing by remember { mutableStateOf(false) }
+    var showSheet by remember { mutableStateOf(false) }
     var showPicker by remember { mutableStateOf(false) }
 
     val dateState = rememberDatePickerState()
@@ -62,9 +63,23 @@ fun ProfileScreen(viewModel: UserViewModel, onBack: () -> Unit) {
         }
     }
 
-    val pickImage =
+    val pickGallery =
         rememberLauncherForActivityResult(ActivityResultContracts.GetContent()) { uri ->
             imageBytes = uri?.let { context.contentResolver.openInputStream(it)?.readBytes() }
+        }
+
+    val takePhoto =
+        rememberLauncherForActivityResult(ActivityResultContracts.TakePicturePreview()) { bitmap ->
+            bitmap?.let {
+                val stream = java.io.ByteArrayOutputStream()
+                it.compress(android.graphics.Bitmap.CompressFormat.PNG, 100, stream)
+                imageBytes = stream.toByteArray()
+            }
+        }
+
+    val requestCameraPermission =
+        rememberLauncherForActivityResult(ActivityResultContracts.RequestPermission()) { granted ->
+            if (granted) takePhoto.launch(null)
         }
 
     val pickCv =
@@ -99,11 +114,34 @@ fun ProfileScreen(viewModel: UserViewModel, onBack: () -> Unit) {
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
 
-            ProfileImage(
-                imageBytes = imageBytes,
-                imageUrl = user?.profileImageUrl,
-                enabled = editing
-            ) { pickImage.launch("image/*") }
+            Box(
+                Modifier
+                    .size(120.dp)
+                    .clip(CircleShape)
+                    .clickable(enabled = editing) { showSheet = true },
+                contentAlignment = Alignment.Center
+            ) {
+                when {
+                    imageBytes != null -> {
+                        val bmp = BitmapFactory.decodeByteArray(imageBytes, 0, imageBytes!!.size)
+                        Image(
+                            bitmap = bmp.asImageBitmap(),
+                            contentDescription = null,
+                            modifier = Modifier.fillMaxSize(),
+                            contentScale = ContentScale.Crop
+                        )
+                    }
+                    !user?.profileImageUrl.isNullOrEmpty() -> {
+                        AsyncImage(
+                            model = user?.profileImageUrl,
+                            contentDescription = null,
+                            modifier = Modifier.fillMaxSize(),
+                            contentScale = ContentScale.Crop
+                        )
+                    }
+                    else -> Icon(Icons.Default.Person, null, Modifier.size(70.dp))
+                }
+            }
 
             Spacer(Modifier.height(24.dp))
 
@@ -130,10 +168,8 @@ fun ProfileScreen(viewModel: UserViewModel, onBack: () -> Unit) {
             if (editing) {
 
                 Spacer(Modifier.height(12.dp))
-                Button(
-                    onClick = { pickCv.launch("application/pdf") }
-                ) {
-                    Icon(Icons.Default.UploadFile, contentDescription = null)
+                Button(onClick = { pickCv.launch("application/pdf") }) {
+                    Icon(Icons.Default.Upload, null)
                     Spacer(Modifier.width(8.dp))
                     Text("Upload CV")
                 }
@@ -151,7 +187,6 @@ fun ProfileScreen(viewModel: UserViewModel, onBack: () -> Unit) {
                             profileImageUrl = user?.profileImageUrl,
                             cvFileUrl = user?.cvFileUrl
                         )
-
                         viewModel.saveUser(updated, imageBytes, cvBytes)
                         scope.launch { snackbar.showSnackbar("Profile saved") }
                     },
@@ -159,31 +194,41 @@ fun ProfileScreen(viewModel: UserViewModel, onBack: () -> Unit) {
                 ) { Text("Save Changes") }
             }
         }
-    }
-}
 
-@Composable
-fun ProfileImage(imageBytes: ByteArray?, imageUrl: String?, enabled: Boolean, onClick: () -> Unit) {
-    Box(
-        Modifier
-            .size(120.dp)
-            .clip(CircleShape)
-            .clickable(enabled = enabled) { onClick() },
-        contentAlignment = Alignment.Center
-    ) {
-        when {
-            imageBytes != null -> {
-                val bmp = BitmapFactory.decodeByteArray(imageBytes, 0, imageBytes.size)
-                Image(bmp.asImageBitmap(), null)
+        if (showSheet) {
+            ModalBottomSheet(onDismissRequest = { showSheet = false }) {
+                Row(
+                    Modifier
+                        .fillMaxWidth()
+                        .clickable {
+                            requestCameraPermission.launch(android.Manifest.permission.CAMERA)
+                            showSheet = false
+                        }
+                        .padding(16.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Icon(Icons.Default.PhotoCamera, null)
+                    Spacer(Modifier.width(12.dp))
+                    Text("Take Photo")
+                }
+
+                Row(
+                    Modifier
+                        .fillMaxWidth()
+                        .clickable {
+                            pickGallery.launch("image/*")
+                            showSheet = false
+                        }
+                        .padding(16.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Icon(Icons.Default.Upload, null)
+                    Spacer(Modifier.width(12.dp))
+                    Text("Choose from Gallery")
+                }
+
+                Spacer(Modifier.height(24.dp))
             }
-            !imageUrl.isNullOrEmpty() -> {
-                AsyncImage(
-                    model = imageUrl,
-                    contentDescription = null,
-                    modifier = Modifier.fillMaxSize()
-                )
-            }
-            else -> Icon(Icons.Default.Person, null, Modifier.size(70.dp))
         }
     }
 }
@@ -208,29 +253,19 @@ fun DobField(value: String, editing: Boolean, onClick: () -> Unit) {
         readOnly = true,
         enabled = editing,
         trailingIcon = {
-            IconButton(
-                onClick = onClick,
-                enabled = editing
-            ) {
-                Icon(
-                    imageVector = Icons.Default.Edit,
-                    contentDescription = null
-                )
+            if (editing) {
+                IconButton(onClick = onClick) {
+                    Icon(Icons.Default.Edit, null)
+                }
             }
         },
         modifier = Modifier.fillMaxWidth()
     )
 }
 
-
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun DateDialog(
-    show: Boolean,
-    state: DatePickerState,
-    onDismiss: () -> Unit,
-    onConfirm: () -> Unit
-) {
+fun DateDialog(show: Boolean, state: DatePickerState, onDismiss: () -> Unit, onConfirm: () -> Unit) {
     if (show) {
         DatePickerDialog(
             onDismissRequest = onDismiss,
