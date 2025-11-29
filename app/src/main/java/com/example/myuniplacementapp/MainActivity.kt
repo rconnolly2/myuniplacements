@@ -21,7 +21,7 @@ import com.example.myuniplacementapp.repository.ApplicationRepository
 import com.example.myuniplacementapp.repository.AnnouncementRepository
 import com.example.myuniplacementapp.repository.PlacementRepository
 import com.example.myuniplacementapp.repository.UserRepository
-import com.example.myuniplacementapp.ui.UserApp
+import com.example.myuniplacementapp.ui.PlacementApp
 import com.example.myuniplacementapp.ui.auth.AuthHost
 import com.example.myuniplacementapp.ui.theme.UserAppTheme
 import com.example.myuniplacementapp.viewmodel.LoginState
@@ -98,7 +98,7 @@ class MainActivity : ComponentActivity() {
 
             UserAppTheme(darkTheme = isDark) {
                 if (loginState is LoginState.Success) {
-                    UserApp(
+                    PlacementApp(
                         userViewModel = userViewModel,
                         settingsViewModel = settingsViewModel,
                         loginViewModel = loginViewModel,

@@ -27,7 +27,7 @@ import com.example.myuniplacementapp.viewmodel.PlacementViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun UserApp(
+fun PlacementApp(
     userViewModel: UserViewModel,
     settingsViewModel: SettingsViewModel,
     loginViewModel: LoginViewModel,
