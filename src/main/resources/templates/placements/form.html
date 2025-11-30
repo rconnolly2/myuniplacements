@@ -65,7 +65,7 @@
                    class="block w-full text-sm text-neutral-300">
 
             <div class="mt-4">
-                <img th:if="${placement.companyLogo != null}"
+                <img th:if="${placement.companyLogo != null and placement.companyLogo != ''}"
                      th:src="${placement.companyLogo}"
                      class="w-24 h-24 object-cover rounded">
             </div>

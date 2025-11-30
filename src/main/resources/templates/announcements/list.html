@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Announcements</title>
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <link rel="stylesheet" href="https://cdn.datatables.net/2.3.5/css/dataTables.dataTables.css">
+    <script src="https://cdn.datatables.net/2.3.5/js/dataTables.js"></script>
+</head>
+
+<body class="bg-neutral-900 text-white">
+
+<div th:replace="~{fragments/navbar :: navbar}"></div>
+
+<div class="max-w-7xl mx-auto py-16 px-4">
+
+    <div class="text-sm text-neutral-400 mb-6">
+        <a href="/dashboard" class="hover:text-[#aa955e]">Dashboard</a>
+        <span class="mx-1">›</span>
+        <span class="font-semibold text-white">Announcements</span>
+    </div>
+
+    <h1 class="text-4xl font-bold mb-8">Announcements</h1>
+
+    <a href="/announcements/new"
+       class="px-4 py-2 bg-[#aa955e] hover:bg-[#bba878] rounded-md inline-flex items-center gap-2 mb-8">
+        <i class="fa-solid fa-plus"></i>
+        Create Announcement
+    </a>
+
+    <div class="bg-neutral-800 rounded-xl p-6 shadow-lg border border-neutral-700 overflow-x-auto">
+
+        <table id="annTable" class="display w-full text-sm border border-neutral-700 rounded-md">
+
+            <thead class="bg-neutral-700 border-b border-neutral-600">
+            <tr>
+                <th class="px-4 py-2 text-left no-sort">Image</th>
+                <th class="px-4 py-2 text-left">Title</th>
+                <th class="px-4 py-2 text-left">Added</th>
+                <th class="px-4 py-2 text-left">Modified</th>
+                <th class="px-4 py-2 text-left no-sort">Actions</th>
+            </tr>
+            </thead>
+
+            <tbody class="divide-y divide-neutral-700">
+
+            <tr th:each="a : ${announcements}">
+
+                <td class="px-4 py-3">
+                    <img th:if="${a.image != ''}"
+                         th:src="${a.image}"
+                         class="w-10 h-10 rounded object-cover"/>
+
+                    <div th:if="${a.image == ''}"
+                         class="w-10 h-10 bg-neutral-600 rounded flex items-center justify-center text-neutral-300 text-xs">
+                        N/A
+                    </div>
+                </td>
+
+                <td class="px-4 py-3" th:text="${a.title}"></td>
+                <td class="px-4 py-3" th:text="${a.addedDate}"></td>
+                <td class="px-4 py-3" th:text="${a.modifiedDate}"></td>
+
+                <td class="px-4 py-3">
+                    <a th:href="@{'/announcements/edit/' + ${a.id}}"
+                       class="text-yellow-400 hover:text-yellow-300 text-xl mr-4">
+                        <i class="fa-solid fa-pen-to-square"></i>
+                    </a>
+
+                    <a th:href="@{'/announcements/delete/' + ${a.id}}"
+                       class="text-red-500 hover:text-red-400 text-xl">
+                        <i class="fa-solid fa-trash"></i>
+                    </a>
+                </td>
+
+            </tr>
+
+            </tbody>
+
+        </table>
+
+    </div>
+
+</div>
+
+<div th:replace="~{fragments/snackbar :: snackbar}"></div>
+<div th:replace="~{fragments/footer :: footer}"></div>
+
+<script>
+    new DataTable("#annTable", {
+        columnDefs: [
+            { orderable: false, targets: "no-sort" }
+        ],
+        layout: {
+            topStart: { search: { placeholder: "Search announcements..." }} ,
+            topEnd: { pageLength: { menu: [5, 10, 25, 50] }} ,
+            bottomEnd: { paging: { buttons: 3 }}
+        },
+        language: {
+            lengthMenu: "Show _MENU_ entries per page",
+            info: "Showing _START_ to _END_ of _TOTAL_",
+            zeroRecords: "No matching announcement",
+            paginate: { previous: "Prev", next: "Next" }
+        }
+    });
+</script>
+
+</body>
+</html>
