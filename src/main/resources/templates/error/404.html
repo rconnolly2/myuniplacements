@@ -6,23 +6,28 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 </head>
 
-<body class="bg-gray-50">
+<body class="bg-neutral-900 text-white">
 
-<div th:replace="fragments/navbar::navbar"></div>
+<div th:replace="~{fragments/navbar :: navbar}"></div>
 
-<div class="max-w-4xl mx-auto mt-20 px-4 text-center">
-    <i class="fa-solid fa-magnifying-glass text-red-500 text-6xl mb-6"></i>
+<div class="max-w-3xl mx-auto py-24 px-4 text-center">
+
+    <i class="fa-solid fa-magnifying-glass text-red-500 text-7xl mb-8"></i>
+
     <h1 class="text-4xl font-bold mb-4">404 – Page Not Found</h1>
-    <p class="text-gray-700 text-lg mb-8">
-        We can’t find the page you’re looking for.
-        It might have been moved or deleted.
+
+    <p class="text-neutral-300 text-lg mb-10">
+        The page you are looking for does not exist.
     </p>
-    <a href="/" class="px-6 py-3 bg-green-700 text-white rounded-lg hover:bg-green-800 transition">
+
+    <a href="/"
+       class="px-6 py-3 bg-[#aa955e] hover:bg-[#bba878] rounded-md font-semibold transition">
         Back to Home
     </a>
+
 </div>
 
-<div th:replace="fragments/footer::footer"></div>
+<div th:replace="~{fragments/footer :: footer}"></div>
 
 </body>
 </html>
