@@ -12,4 +12,5 @@ public class Placement {
     private String location;
     private String addedDate;
     private String modifiedDate;
+    private String placementUrl;
 }
