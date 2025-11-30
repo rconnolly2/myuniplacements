@@ -45,6 +45,7 @@ public class PlacementService {
         if (isNew) {
             p.setAddedDate(LocalDate.now().toString());
             p.setModifiedDate(LocalDate.now().toString());
+            p.setCompanyLogo("");
         } else {
             p.setAddedDate(old.getAddedDate());
             p.setModifiedDate(LocalDate.now().toString());

@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
-    <title>Placements</title>
+    <title>Students</title>
 
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
@@ -19,59 +19,67 @@
     <div class="text-sm text-neutral-400 mb-6">
         <a href="/dashboard" class="hover:text-[#aa955e]">Dashboard</a>
         <span class="mx-1">›</span>
-        <span class="font-semibold text-white">Placements</span>
+        <span class="font-semibold text-white">Students</span>
     </div>
 
-    <h1 class="text-4xl font-bold mb-8">Placements</h1>
-
-    <a href="/placements/new"
-       class="px-4 py-2 bg-[#aa955e] hover:bg-[#bba878] rounded-md inline-flex items-center gap-2 mb-8">
-        <i class="fa-solid fa-plus"></i>
-        Create Placement
-    </a>
+    <h1 class="text-4xl font-bold mb-8">Students</h1>
 
     <div class="bg-neutral-800 rounded-xl p-6 shadow-lg border border-neutral-700 overflow-x-auto">
 
-        <table id="placementsTable" class="display w-full text-sm border border-neutral-700 rounded-md">
+        <table id="studentsTable" class="display w-full text-sm border border-neutral-700 rounded-md">
             <thead class="bg-neutral-700 border-b border-neutral-600">
             <tr>
-                <th class="px-4 py-2 text-left no-sort">Logo</th>
-                <th class="px-4 py-2 text-left">Title</th>
-                <th class="px-4 py-2 text-left">Company</th>
-                <th class="px-4 py-2 text-left">Location</th>
-                <th class="px-4 py-2 text-left">Added</th>
+                <th class="px-4 py-2 text-left no-sort">Photo</th>
+                <th class="px-4 py-2 text-left">Name</th>
+                <th class="px-4 py-2 text-left">Email</th>
+                <th class="px-4 py-2 text-left">Phone</th>
+                <th class="px-4 py-2 text-left">DOB</th>
                 <th class="px-4 py-2 text-left no-sort">Actions</th>
             </tr>
             </thead>
 
             <tbody class="divide-y divide-neutral-700">
 
-            <tr th:each="p : ${placements}">
+            <tr th:each="s : ${students}">
+
                 <td class="px-4 py-3">
-                    <img th:if="${p.companyLogo != ''}"
-                         th:src="${p.companyLogo}"
+                    <img th:if="${s.profileImageUrl != ''}"
+                         th:src="${s.profileImageUrl}"
                          class="w-10 h-10 rounded object-cover"/>
 
-                    <div th:if="${p.companyLogo == ''}"
+                    <div th:if="${s.profileImageUrl == ''}"
                          class="w-10 h-10 bg-neutral-600 rounded flex items-center justify-center text-neutral-300 text-xs">
                         N/A
                     </div>
                 </td>
 
-                <td class="px-4 py-3" th:text="${p.title}"></td>
-                <td class="px-4 py-3" th:text="${p.company}"></td>
-                <td class="px-4 py-3" th:text="${p.location}"></td>
-                <td class="px-4 py-3" th:text="${p.addedDate}"></td>
+                <td class="px-4 py-3"
+                    th:text="${s.firstName + ' ' + s.lastName}"></td>
+
+                <td class="px-4 py-3" th:text="${s.email}"></td>
+
+                <td class="px-4 py-3"
+                    th:text="${s.phoneNumber == '' ? 'Not filled' : s.phoneNumber}"></td>
+
+                <td class="px-4 py-3"
+                    th:text="${s.dateOfBirth == '' ? 'Not filled' : s.dateOfBirth}"></td>
 
                 <td class="px-4 py-3">
-                    <a th:href="@{'/placements/edit/' + ${p.id}}" class="text-yellow-400 hover:text-yellow-300 text-xl mr-4">
-                        <i class="fa-solid fa-pen-to-square"></i>
+
+                    <a th:href="@{'/students/applications/' + ${s.email}}"
+                       class="text-yellow-400 hover:text-yellow-300 text-xl mr-4">
+                        <i class="fa-solid fa-folder-open"></i>
                     </a>
 
-                    <a th:href="@{'/placements/delete/' + ${p.id}}" class="text-red-500 hover:text-red-400 text-xl">
-                        <i class="fa-solid fa-trash"></i>
+                    <a th:if="${s.cvFileUrl != ''}"
+                       th:href="${s.cvFileUrl}"
+                       target="_blank"
+                       class="text-blue-400 hover:text-blue-300 text-xl">
+                        <i class="fa-solid fa-file"></i>
                     </a>
+
                 </td>
+
             </tr>
 
             </tbody>
@@ -84,21 +92,21 @@
 <div th:replace="~{fragments/footer :: footer}"></div>
 
 <script>
-    new DataTable("#placementsTable", {
+    new DataTable("#studentsTable", {
         columnDefs: [
             { orderable: false, targets: "no-sort" }
         ],
         layout: {
-            topStart: { search: { placeholder: "Search placements..." }},
+            topStart: { search: { placeholder: "Search students..." }},
             topEnd: { pageLength: { menu: [5, 10, 25, 50] }},
             bottomEnd: { paging: { buttons: 3 }}
         },
         language: {
-            lengthMenu: "Show _MENU_ placements per page",
-            info: "Showing _START_ to _END_ of _TOTAL_ placements",
-            infoEmpty: "No placements found",
+            lengthMenu: "Show _MENU_ students per page",
+            info: "Showing _START_ to _END_ of _TOTAL_ students",
+            infoEmpty: "No students found",
             infoFiltered: "(filtered from _MAX_ total)",
-            zeroRecords: "No matching placement",
+            zeroRecords: "No matching student",
             paginate: { previous: "Prev", next: "Next" }
         }
     });
