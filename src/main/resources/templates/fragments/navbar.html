@@ -24,6 +24,7 @@
 
     <div id="mobile-menu" class="hidden flex-col bg-[#1A1A1A] border-t border-[#2f2f2f] px-6 pb-4 md:hidden">
         <a th:if="${session.user != null}" href="/dashboard" class="py-2 text-gray-300 hover:text-[#C8A96A]">Dashboard</a>
+        <br>
         <a th:if="${session.user != null}" href="/logout" class="py-2 text-gray-300 hover:text-[#C8A96A]">Logout</a>
         <a th:if="${session.user == null}" href="/login" class="py-2 text-gray-300 hover:text-[#C8A96A]">Login</a>
     </div>
