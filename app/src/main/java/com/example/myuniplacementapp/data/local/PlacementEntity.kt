@@ -12,6 +12,7 @@ data class PlacementEntity(
     val company: String,
     val companyLogo: String,
     val description: String,
+    val placementUrl: String,
     val addedDate: LocalDate,
     val modifiedDate: LocalDate,
     val location: LocationType

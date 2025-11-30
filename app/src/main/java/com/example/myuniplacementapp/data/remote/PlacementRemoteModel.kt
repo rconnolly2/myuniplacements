@@ -8,6 +8,7 @@ data class PlacementRemoteModel(
     val company: String = "",
     val companyLogo: String = "",
     val description: String = "",
+    val placementUrl: String = "",
     val location: LocationType = LocationType.OTHER,
     val addedDate: String = "",
     val modifiedDate: String = ""

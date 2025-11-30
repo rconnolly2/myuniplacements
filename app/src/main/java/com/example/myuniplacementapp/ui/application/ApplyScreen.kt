@@ -159,7 +159,6 @@ fun ApplyScreen(
 fun ApplyHeader(placement: PlacementEntity?) {
     if (placement == null) return
 
-    val website = "https://google.es"
     val context = LocalContext.current
 
     Column(
@@ -198,7 +197,7 @@ fun ApplyHeader(placement: PlacementEntity?) {
                 OutlinedButton(
                     onClick = {
                         val intent = android.content.Intent(android.content.Intent.ACTION_VIEW)
-                        intent.data = website.toUri()
+                        intent.data = placement.placementUrl.toUri()
                         ContextCompat.startActivity(context, intent, null)
                     },
                     modifier = Modifier

@@ -23,6 +23,7 @@ class PlacementRemoteDataSource(
                 company = model.company,
                 companyLogo = model.companyLogo,
                 description = model.description,
+                placementUrl = model.placementUrl,
                 location = model.location,
                 addedDate = added,
                 modifiedDate = modified

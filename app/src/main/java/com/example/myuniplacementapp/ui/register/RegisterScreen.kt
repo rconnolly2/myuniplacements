@@ -188,6 +188,11 @@ fun RegisterScreen(
                     Text("Register", style = MaterialTheme.typography.titleLarge)
                 }
 
+                // I add some under register button spacing only when there is no errors
+                if (state !is LoginState.Error && state !is LoginState.Loading) {
+                    Spacer(Modifier.height(32.dp))
+                }
+
                 when (state) {
                     is LoginState.Loading -> {
                         Spacer(Modifier.height(20.dp))
