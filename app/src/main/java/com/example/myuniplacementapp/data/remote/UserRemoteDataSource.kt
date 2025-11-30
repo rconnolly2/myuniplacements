@@ -41,28 +41,4 @@ class UserRemoteDataSource(
             cvFileUrl = m.cvFileUrl
         )
     }
-
-    suspend fun getAllUsers(): List<UserEntity> {
-        val snap = users.get().await()
-
-        return snap.documents.mapNotNull { doc ->
-            val m = doc.toObject(UserRemoteModel::class.java) ?: return@mapNotNull null
-
-            val dob = if (m.dateOfBirth.isNotBlank()) LocalDate.parse(m.dateOfBirth) else null
-
-            UserEntity(
-                email = m.email,
-                firstName = m.firstName,
-                lastName = m.lastName,
-                phoneNumber = m.phoneNumber,
-                dateOfBirth = dob,
-                profileImageUrl = m.profileImageUrl,
-                cvFileUrl = m.cvFileUrl
-            )
-        }
-    }
-
-    suspend fun deleteUserProfile(user: UserEntity) {
-        users.document(user.email).delete().await()
-    }
 }

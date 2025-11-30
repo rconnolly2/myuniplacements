@@ -24,6 +24,7 @@ import com.example.myuniplacementapp.viewmodel.AnnouncementViewModel
 import com.example.myuniplacementapp.viewmodel.ApplicationViewModel
 import com.example.myuniplacementapp.viewmodel.LoginViewModel
 import com.example.myuniplacementapp.viewmodel.PlacementViewModel
+import com.google.firebase.auth.FirebaseAuth
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -83,6 +84,10 @@ fun PlacementApp(
                 modifier = Modifier.padding(innerPadding)
             ) {
                 composable("home") {
+                    LaunchedEffect(true) {
+                        placementViewModel.reload()
+                        announcementViewModel.reload()
+                    }
                     HomeScreen(
                         placementViewModel = placementViewModel,
                         announcementViewModel = announcementViewModel,
@@ -97,7 +102,7 @@ fun PlacementApp(
                 }
                 composable("my_applications") {
                     MyApplicationsScreen(
-                        userEmail = "robertoconnolly100@gmail.com",
+                        userEmail = FirebaseAuth.getInstance().currentUser?.email.toString(),
                         applicationViewModel = applicationViewModel,
                         placementViewModel = placementViewModel,
                         onOpenDetails = { id -> navController.navigate("application_details/$id") },
@@ -105,6 +110,10 @@ fun PlacementApp(
                     )
                 }
                 composable("placements") {
+                    LaunchedEffect(true) {
+                        placementViewModel.reload()
+                        announcementViewModel.reload()
+                    }
                     PlacementsScreen(
                         placementViewModel = placementViewModel,
                         navController = navController

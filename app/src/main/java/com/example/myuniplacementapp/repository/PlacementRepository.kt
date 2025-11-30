@@ -14,18 +14,16 @@ class PlacementRepository(
     fun getAllPlacements(): Flow<List<PlacementEntity>> =
         dao.getAllPlacements().onStart {
             if (isOnline()) {
-                val list = remote.getAllPlacements()
-                dao.insertPlacements(list)
+                val placements = remote.getAllPlacements()
+                dao.insertPlacements(placements)
             }
         }
 
-    suspend fun getPlacement(id: String): PlacementEntity? {
-        return if (isOnline()) {
-            val item = remote.getPlacement(id)
-            if (item != null) dao.insertPlacement(item)
-            item
-        } else {
-            dao.getPlacementById(id)
+    suspend fun refresh() {
+        if (isOnline()) {
+            val placements = remote.getAllPlacements()
+            dao.deleteAllPlacements()
+            dao.insertPlacements(placements)
         }
     }
 }

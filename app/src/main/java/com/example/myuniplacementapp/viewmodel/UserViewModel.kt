@@ -14,9 +14,6 @@ class UserViewModel(private val repo: UserRepository) : ViewModel() {
     private val _user = MutableStateFlow<UserEntity?>(null)
     val user = _user.asStateFlow()
 
-    val users = repo.getAllUsers()
-        .stateIn(viewModelScope, SharingStarted.Lazily, emptyList())
-
     fun addUser(user: UserEntity) {
         viewModelScope.launch {
             repo.addUser(user)
@@ -44,9 +41,6 @@ class UserViewModel(private val repo: UserRepository) : ViewModel() {
     fun getUserFlow(email: String): Flow<UserEntity?> =
         repo.getUserFlow(email)
 
-    fun deleteUser(user: UserEntity) {
-        viewModelScope.launch { repo.deleteUser(user) }
-    }
 }
 
 class UserViewModelFactory(private val repo: UserRepository) : ViewModelProvider.Factory {

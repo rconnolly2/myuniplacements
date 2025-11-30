@@ -19,4 +19,7 @@ interface AnnouncementDao {
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertAnnouncements(list: List<AnnouncementEntity>)
+
+    @Query("DELETE FROM announcement_table")
+    suspend fun deleteAllAnnouncements()
 }

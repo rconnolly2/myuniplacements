@@ -20,13 +20,11 @@ class AnnouncementRepository(
             }
         }
 
-    suspend fun getAnnouncement(id: String): AnnouncementEntity? {
-        return if (isOnline()) {
-            val item = remote.getAnnouncement(id)
-            if (item != null) dao.insertAnnouncement(item)
-            item
-        } else {
-            dao.getAnnouncementById(id)
+    suspend fun refresh() {
+        if (isOnline()) {
+            val placements = remote.getAllAnnouncements()
+            dao.deleteAllAnnouncements()
+            dao.insertAnnouncements(placements)
         }
     }
 }

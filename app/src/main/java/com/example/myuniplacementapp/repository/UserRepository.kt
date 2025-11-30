@@ -70,17 +70,4 @@ class UserRepository(
             }
         }
     }
-
-    fun getAllUsers(): Flow<List<UserEntity>> =
-        dao.getAllUsers().onStart {
-            if (isOnline()) {
-                val list = remote.getAllUsers()
-                list.forEach { dao.insertUser(it) }
-            }
-        }
-
-    suspend fun deleteUser(user: UserEntity) {
-        dao.deleteUser(user)
-        if (isOnline()) remote.deleteUserProfile(user)
-    }
 }

@@ -15,9 +15,9 @@ class AnnouncementViewModel(private val repository: AnnouncementRepository) : Vi
     val announcements: StateFlow<List<AnnouncementEntity>> =
         repository.getAllAnnouncements().stateIn(viewModelScope, SharingStarted.Lazily, emptyList())
 
-    fun getAnnouncement(id: String) {
+    fun reload() {
         viewModelScope.launch {
-            repository.getAnnouncement(id)
+            repository.refresh()
         }
     }
 }

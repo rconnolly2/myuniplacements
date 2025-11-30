@@ -1,11 +1,11 @@
 package com.example.myuniplacementapp.ui.register
 
-import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.*
@@ -65,10 +65,11 @@ fun RegisterScreen(
     ) { padding ->
 
         Column(
-            Modifier
+            modifier = Modifier
                 .padding(padding)
                 .fillMaxSize()
                 .background(MaterialTheme.colorScheme.background)
+                .verticalScroll(rememberScrollState())
         ) {
 
             Row(
@@ -76,7 +77,6 @@ fun RegisterScreen(
                     .fillMaxWidth()
                     .height(300.dp)
             ) {
-
                 Image(
                     painter = painterResource(R.drawable.register_students),
                     contentDescription = null,
@@ -171,9 +171,13 @@ fun RegisterScreen(
 
                 Button(
                     onClick = {
-                        if (password.isNotBlank() && email.isNotBlank() && password.isNotBlank() && firstName.isNotBlank() && lastName.isNotBlank()) {
+                        if (password.isNotBlank() && email.isNotBlank() &&
+                            firstName.isNotBlank() && lastName.isNotBlank()
+                        ) {
                             loginViewModel.register(email, password)
-                            userViewModel.addUser(UserEntity(email, firstName, lastName, "", null, null, null))
+                            userViewModel.addUser(
+                                UserEntity(email, firstName, lastName, "", null, null, null)
+                            )
                         }
                     },
                     modifier = Modifier

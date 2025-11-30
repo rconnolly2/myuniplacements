@@ -1,6 +1,7 @@
 package com.example.myuniplacementapp.data.local
 
 import androidx.room.Dao
+import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
@@ -19,4 +20,7 @@ interface PlacementDao {
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertPlacements(list: List<PlacementEntity>)
+
+    @Query("DELETE FROM placement_table")
+    suspend fun deleteAllPlacements()
 }

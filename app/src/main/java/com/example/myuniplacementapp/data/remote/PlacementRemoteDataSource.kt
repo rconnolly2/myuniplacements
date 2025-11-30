@@ -10,24 +10,6 @@ class PlacementRemoteDataSource(
 ) {
     private val col = firestore.collection("placements")
 
-    suspend fun getPlacement(id: String): PlacementEntity? {
-        val snap = col.document(id).get().await()
-        val model = snap.toObject(PlacementRemoteModel::class.java) ?: return null
-        val added = model.addedDate.takeIf { it.isNotBlank() }?.let { LocalDate.parse(it) } ?: LocalDate.now()
-        val modified = model.modifiedDate.takeIf { it.isNotBlank() }?.let { LocalDate.parse(it) } ?: LocalDate.now()
-
-        return PlacementEntity(
-            id = model.id,
-            title = model.title,
-            company = model.company,
-            companyLogo = model.companyLogo,
-            description = model.description,
-            location = model.location,
-            addedDate = added,
-            modifiedDate = modified
-        )
-    }
-
     suspend fun getAllPlacements(): List<PlacementEntity> {
         val snap = col.get().await()
         return snap.documents.mapNotNull {
