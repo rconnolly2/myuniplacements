@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>MyUniPlacements – Login</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+
+<body class="bg-[#111] text-white flex items-center justify-center h-screen">
+
+<div th:replace="fragments/snackbar :: snackbar"></div>
+
+<div class="bg-[#1A1A1A] p-10 rounded-xl shadow-lg w-full max-w-md border border-[#2a2a2a]">
+    <div class="text-center mb-6">
+        <img src="/images/brand/logo.png" class="h-16 mx-auto mb-3">
+        <h1 class="text-3xl font-bold">Admin Login</h1>
+        <p class="text-gray-400 text-sm mt-1">Coordinator Access Only</p>
+    </div>
+
+    <form method="post" action="/login">
+        <input name="email" type="email"
+               class="w-full mb-4 p-3 rounded bg-[#222] border border-[#444]"
+               placeholder="Email">
+
+        <input name="password" type="password"
+               class="w-full mb-6 p-3 rounded bg-[#222] border border-[#444]"
+               placeholder="Password">
+
+        <button
+                class="w-full bg-[#C8A96A] text-black py-3 rounded font-semibold hover:bg-[#dabc7c] transition">
+            Login
+        </button>
+    </form>
+</div>
+
+</body>
+</html>

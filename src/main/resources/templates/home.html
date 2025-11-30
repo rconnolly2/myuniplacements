@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>MyUniPlacements – Admin Panel</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+
+<body class="bg-[#111] text-white">
+
+<div th:replace="fragments/navbar :: navbar"></div>
+
+<section class="relative w-full h-[420px]">
+    <img src="/images/general/students.png"
+         class="w-full h-full object-cover opacity-30">
+
+    <div class="absolute inset-0 flex flex-col items-center justify-center text-center px-6">
+        <img src="/images/brand/logo.png" class="h-20 mb-4">
+
+        <h1 class="text-4xl font-bold text-white drop-shadow-xl">
+            MyUniPlacements Admin Panel
+        </h1>
+
+        <p class="text-lg mt-3 text-gray-200 max-w-2xl">
+            TUS presents MyUniPlacements, a platform designed to help students find work placements
+            and support coordinators in monitoring placement progress, applications, and announcements.
+        </p>
+    </div>
+</section>
+
+<section class="max-w-6xl mx-auto mt-20 px-6 grid md:grid-cols-3 gap-10 mb-28">
+
+    <a href="/placements" class="bg-[#1A1A1A] p-6 rounded-xl shadow-lg border border-[#3a3a3a] hover:border-yellow-500 transition flex flex-col h-full">
+        <img src="/images/general/interview.png" class="h-32 w-full object-cover rounded mb-4">
+        <h3 class="text-xl font-semibold mb-2">Manage Placements</h3>
+        <p class="text-gray-400 flex-grow">View all student placement applications and update statuses.</p>
+    </a>
+
+    <a href="/students" class="bg-[#1A1A1A] p-6 rounded-xl shadow-lg border border-[#3a3a3a] hover:border-yellow-500 transition flex flex-col h-full">
+        <img src="/images/general/lecture.png" class="h-32 w-full object-cover rounded mb-4">
+        <h3 class="text-xl font-semibold mb-2">Student Overview</h3>
+        <p class="text-gray-400 flex-grow">Browse registered students and monitor their progress.</p>
+    </a>
+
+    <a href="/announcements" class="bg-[#1A1A1A] p-6 rounded-xl shadow-lg border border-[#3a3a3a] hover:border-yellow-500 transition flex flex-col h-full">
+        <img src="/images/general/woman-smile.png" class="h-32 w-full object-cover rounded mb-4">
+        <h3 class="text-xl font-semibold mb-2">Post Announcements</h3>
+        <p class="text-gray-400 flex-grow">Publish new updates or placement opportunities instantly.</p>
+    </a>
+
+</section>
+
+<div class="mt-10" th:replace="fragments/footer :: footer"></div>
+
+</body>
+</html>

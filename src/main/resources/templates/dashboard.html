@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Admin Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+
+<body class="bg-[#111] text-white min-h-screen flex flex-col">
+
+<div th:replace="fragments/navbar :: navbar"></div>
+
+<div class="max-w-6xl mx-auto mt-12 px-6 flex-grow">
+    <h1 class="text-3xl font-bold mb-10">Dashboard</h1>
+
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+
+        <a href="/placements"
+           class="bg-[#1A1A1A] p-6 rounded-xl border border-[#2f2f2f] hover:border-[#C8A96A] transition flex gap-4 items-center">
+            <i class="fa-solid fa-briefcase text-4xl text-[#C8A96A]"></i>
+            <div>
+                <h3 class="text-xl font-semibold">Placements</h3>
+                <p class="text-gray-400 text-sm">Manage student placement applications</p>
+            </div>
+        </a>
+
+        <a href="/students"
+           class="bg-[#1A1A1A] p-6 rounded-xl border border-[#2f2f2f] hover:border-[#C8A96A] transition flex gap-4 items-center">
+            <i class="fa-solid fa-users text-4xl text-[#C8A96A]"></i>
+            <div>
+                <h3 class="text-xl font-semibold">Students</h3>
+                <p class="text-gray-400 text-sm">View or track student progress</p>
+            </div>
+        </a>
+
+        <a href="/announcements"
+           class="bg-[#1A1A1A] p-6 rounded-xl border border-[#2f2f2f] hover:border-[#C8A96A] transition flex gap-4 items-center">
+            <i class="fa-solid fa-bullhorn text-4xl text-[#C8A96A]"></i>
+            <div>
+                <h3 class="text-xl font-semibold">Announcements</h3>
+                <p class="text-gray-400 text-sm">Post new updates for students</p>
+            </div>
+        </a>
+
+    </div>
+</div>
+
+<div th:replace="fragments/footer :: footer"></div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/js/all.min.js"></script>
+</body>
+</html>
