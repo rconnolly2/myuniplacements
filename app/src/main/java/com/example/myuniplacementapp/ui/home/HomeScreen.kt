@@ -6,9 +6,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -112,14 +110,10 @@ fun HomeScreen(
                     Row(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .background(
-                                MaterialTheme.colorScheme.secondary.copy(alpha = 0.92f),
-                                RoundedCornerShape(18.dp)
-                            )
+                            .clip(RoundedCornerShape(18.dp))
+                            .clickable { navController.navigate("apply/${placement.id}") }
+                            .background(MaterialTheme.colorScheme.secondary.copy(alpha = 0.92f))
                             .padding(16.dp)
-                            .clickable {
-                                navController.navigate("apply/${placement.id}")
-                            }
                     ) {
                         AsyncImage(
                             model = placement.companyLogo,
